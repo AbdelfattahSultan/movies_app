@@ -42,6 +42,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
   dartz: ^0.10.1
+  flutter_native_splash: ^2.4.7
 dev_dependencies:
   flutter_test:
     sdk: flutter

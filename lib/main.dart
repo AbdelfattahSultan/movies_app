@@ -5,6 +5,8 @@ import 'package:movies_app/core/theme/app_theme.dart';
 import 'package:movies_app/features/authentication/presentation/screen/Login/Login.dart';
 import 'package:movies_app/features/authentication/presentation/screen/Register/Register.dart';
 import 'package:movies_app/features/authentication/presentation/auth_cubite/lang/cubite/lan_cubit.dart';
+import 'package:movies_app/features/onboarding/presentation/screen/intro_screen.dart';
+import 'package:movies_app/features/onboarding/presentation/screen/onBoarding.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 
 void main() {
@@ -27,8 +29,10 @@ class MyApp extends StatelessWidget {
       routes: {
         AppRoutes.loginScreen: (context) => const Login(),
         AppRoutes.registerScreen: (context) => const Register(),
+        AppRoutes.onBoardingScreen: (context) => const Onboarding(),
+        AppRoutes.introScreen: (context) => const IntroScreen(),
       },
-      initialRoute: AppRoutes.loginScreen,
+      initialRoute: AppRoutes.onBoardingScreen,
     );
   }
 }
