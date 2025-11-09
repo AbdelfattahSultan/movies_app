@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/core/api/api_service.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  const ResetPasswordScreen({super.key});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -11,8 +11,7 @@ class ResetPasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-  TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   bool isLoading = false;
 
@@ -37,22 +36,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     setState(() => isLoading = true);
 
+    // احفظ المراجع قبل await
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     final result = await ApiService.patchResetPassword(code, newPassword);
+
+    if (!mounted) return; // تأكد أن الـwidget لسه موجودة بعد الـawait
 
     setState(() => isLoading = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Text(
-          result
-              ? 'تم تعيين كلمة المرور بنجاح ✅'
-              : 'فشل في تعيين كلمة المرور ❌',
+          result ? 'تم تعيين كلمة المرور بنجاح ✅' : 'فشل في تعيين كلمة المرور ❌',
         ),
       ),
     );
 
     if (result) {
-      Navigator.pop(context); // يرجع المستخدم لشاشة تسجيل الدخول
+      navigator.pop(); // رجوع للشاشة السابقة
     }
   }
 
