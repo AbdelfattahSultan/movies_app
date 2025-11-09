@@ -3,7 +3,7 @@ import 'package:movies_app/core/api/api_service.dart';
 import 'package:movies_app/features/3_authentication/view/reset_password_screen.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({Key? key}) : super(key: key);
+  const ForgetPasswordScreen({super.key});
 
   @override
   State<ForgetPasswordScreen> createState() => _ForgetPasswordScreenState();
@@ -25,21 +25,24 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
     setState(() => isLoading = true);
 
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     final result = await ApiService.resetPassword(email);
+
+    if (!mounted) return;
 
     setState(() => isLoading = false);
 
     if (result) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('تم إرسال رابط إعادة التعيين بنجاح ✅')),
       );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
+      navigator.push(
+        MaterialPageRoute(builder: (_) => const ResetPasswordScreen()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('حدث خطأ أثناء الإرسال ❌')),
       );
     }
@@ -69,8 +72,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-
-              // 🖼️ الصندوق الرمادي اللي فيه الصورة
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -83,10 +84,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   width: 430,
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // 📨 عنوان بسيط
               const Text(
                 'Enter your email to reset your password',
                 textAlign: TextAlign.center,
@@ -95,10 +93,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   fontSize: 16,
                 ),
               ),
-
               const SizedBox(height: 30),
-
-              // ✉️ حقل الإيميل
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -106,7 +101,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.email_outlined, color: Colors.amber),
+                  prefixIcon:
+                  const Icon(Icons.email_outlined, color: Colors.amber),
                   filled: true,
                   fillColor: Colors.grey[850],
                   border: OutlineInputBorder(
@@ -119,10 +115,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // 🔘 زر Verify Email
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -153,4 +146,3 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     );
   }
 }
-
