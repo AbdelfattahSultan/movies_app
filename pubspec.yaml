@@ -42,8 +42,14 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
   dartz: ^0.10.1
-  flutter_native_splash: ^2.4.7
+  carousel_slider: ^5.1.1
+  pretty_dio_logger: ^1.4.0
+  injectable: ^2.6.0
+  get_it:
+  cached_network_image: ^3.4.1
 dev_dependencies:
+  injectable_generator:
+  build_runner:
   flutter_test:
     sdk: flutter
 
