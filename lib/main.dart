@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/features/3_authentication/view/forget_password_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/core/di/Di.dart';
 import 'package:movies_app/core/config/app_routes.dart';
@@ -17,22 +18,23 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: AppTheme.theme,
-      themeMode: ThemeMode.dark,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: context.watch<LanCubit>().state,
-      routes: {
-        AppRoutes.loginScreen: (context) => const Login(),
-        AppRoutes.registerScreen: (context) => const Register(),
-        AppRoutes.HomeTab : (context) => const Hometab(),
-      },
-      initialRoute: AppRoutes.HomeTab,
-    );
-  }
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    title: 'Movies App',
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.theme,
+    themeMode: ThemeMode.dark,
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: context.watch<LanCubit>().state,
+    routes: {
+      AppRoutes.loginScreen: (context) => const Login(),
+      AppRoutes.registerScreen: (context) => const Register(),
+      AppRoutes.HomeTab: (context) => const Hometab(),
+      '/forgetPassword': (context) => const ForgetPasswordScreen(),
+    },
+    initialRoute: AppRoutes.HomeTab,
+  );
+}
 }
