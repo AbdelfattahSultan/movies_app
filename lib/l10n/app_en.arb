@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "forgetPass": "Forget Password?",
+  "login": "Login",
+  "noAccount": "Don’t have an account?",
+  "createAccount": "Create Account",
+  "or": "Or",
+  "google": "Login With Google",
+  "alreadyHave": "Already Have Account ?",
+  "register": "Register",
+  "email": "Email",
+  "name": "Name",
+  "phone": "Phone",
+  "password": "Password",
+  "confirmPassword": "Re Password",
+  "chooseAvatar": "Choose Your Avatar"
+}
