@@ -49,6 +49,7 @@ dependencies:
   injectable: ^2.6.0
   get_it:
   cached_network_image: ^3.4.1
+  flutter_svg: ^2.2.2
 dev_dependencies:
   injectable_generator:
   build_runner:

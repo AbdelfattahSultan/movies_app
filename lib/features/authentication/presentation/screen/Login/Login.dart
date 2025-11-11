@@ -102,7 +102,12 @@ class _LoginState extends State<Login> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.forgetPassword,
+                            );
+                          },
                           child: Text(
                             l10n.forgetPass,
                             style: TextStyle(color: AppColors.primary),
@@ -122,6 +127,10 @@ class _LoginState extends State<Login> {
                                 context.read<LoginCubit>().login(
                                   email: emailController.text,
                                   password: passwordController.text,
+                                );
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.homeTab,
                                 );
                               }
                             },
