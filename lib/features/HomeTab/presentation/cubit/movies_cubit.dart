@@ -12,7 +12,7 @@ class MoviesCubit extends Cubit<MoviesState>{
   final MoviesReposatry moviesReposatry;
 
   List<Movie> _topMovies = [];
-  Map<String, List<Movie>> _genreMoviesMap = {};
+  final Map<String, List<Movie>> _genreMoviesMap = {};
 
   MoviesCubit(this.moviesReposatry) : super(MoviesInti());
 

@@ -12,7 +12,8 @@ final ApiManagerHomeTab apiManager ;
   return  await apiManager.getTopMovies(limit, dateAdd);
 
   }
-Future<List<Movie>> getMoviesByGenre(int limit, String genre)async {
+@override
+  Future<List<Movie>> getMoviesByGenre(int limit, String genre)async {
   return  await apiManager.getMoviesByGenre(limit, genre);
 
 }

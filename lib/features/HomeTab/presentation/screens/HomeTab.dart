@@ -166,7 +166,7 @@ class _HometabState extends State<Hometab> {
                 },
               ),
 
-              ...genresToDisplay.map((genre) => _buildGenreSection(context, genre)).toList(),
+              ...genresToDisplay.map((genre) => _buildGenreSection(context, genre)),
 
               const SizedBox(height: 20),
             ],
