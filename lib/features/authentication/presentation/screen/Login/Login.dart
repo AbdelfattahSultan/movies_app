@@ -122,20 +122,20 @@ class _LoginState extends State<Login> {
                       ),
                     )
                         : CustomButton(
-                      onTap: () {
-                        if (checkValidate()) {
-                          context.read<LoginCubit>().login(
-                            email: emailController.text,
-                            password: passwordController.text,
-                          );
-                          Navigator.pushReplacementNamed(
-                            context,
-                            AppRoutes.homeScreen,
-                          );
-                        }
-                      },
-                      content: l10n.login,
-                    ),
+                            onTap: () {
+                              if (checkValidate()) {
+                                context.read<LoginCubit>().login(
+                                  email: emailController.text,
+                                  password: passwordController.text,
+                                );
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.homeScreen,
+                                );
+                              }
+                            },
+                            content: l10n.login,
+                          ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
