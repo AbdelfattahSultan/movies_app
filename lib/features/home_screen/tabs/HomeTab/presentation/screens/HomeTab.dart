@@ -155,7 +155,7 @@ class _HomeTabState extends State<HomeTab> {
                                 },
                               ),
 
-                              Image(image: AssetImage(AppImages.WatchNow)),
+                              Image(image: AssetImage(AppImages.watchNow)),
                             ],
                           ),
                         ),

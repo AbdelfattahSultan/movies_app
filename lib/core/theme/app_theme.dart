@@ -13,7 +13,7 @@ class AppTheme {
        showSelectedLabels: false,
   showUnselectedLabels: false,
       backgroundColor:  const Color(0XFF121312),
-      
+
     )
   );
 }

@@ -117,10 +117,10 @@ class _LoginState extends State<Login> {
                     ),
                     (state is LoginLoadingState)
                         ? const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          )
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
                         : CustomButton(
                             onTap: () {
                               if (checkValidate()) {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/screens/HomeTab.dart';
 import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/browse_tap.dart';
-import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/Profile_tap.dart';
 import 'package:movies_app/features/home_screen/tabs/search_tab/presentation/screens/search_tap.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,50 +17,100 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int navIndex = 0;
 
-  List<Widget> pages = const [
+  final List<Widget> pages = const [
     HomeTab(),
     SearchTap(),
     BrowseTap(),
-    ProfileTap(),
+    SizedBox(), // placeholder للـ Profile
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: pages[navIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(),
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 9),
-        child: BottomNavigationBar(
-          currentIndex: navIndex,
-          showSelectedLabels: true,
-          elevation: 0,
-          onTap: (index) {
-            setState(() {
-              navIndex = index;
-            });
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(AppImages.homeIcn),
-              label: '',
-              activeIcon: SvgPicture.asset(AppImages.homeFill),
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(AppImages.searchIcn),
-              label: '',
-              activeIcon: SvgPicture.asset(AppImages.searchFill),
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(AppImages.browseIcn),
-              label: '',
-              activeIcon: SvgPicture.asset(AppImages.browseFill),
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(AppImages.profileIcn),
-              label: '',
-              activeIcon: SvgPicture.asset(AppImages.profileFill),
-            ),
-          ],
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+        child: Container(
+          height: 63,
+          decoration: BoxDecoration(
+            color: AppColors.darkGray,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: Colors.white,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            currentIndex: navIndex,
+            elevation: 0,
+            onTap: (index) {
+              if (index == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              } else {
+                setState(() {
+                  navIndex = index;
+                });
+              }
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  AppImages.homeIcon,
+                  colorFilter: ColorFilter.mode(
+                    navIndex == 0 ? AppColors.primary : Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  AppImages.searchIcon,
+                  colorFilter: ColorFilter.mode(
+                    navIndex == 1 ? AppColors.primary : Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                label: 'Search',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  AppImages.exploreIcon,
+                  colorFilter: ColorFilter.mode(
+                    navIndex == 2 ? AppColors.primary : Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                label: 'Browse',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  AppImages.profileIcon,
+                  colorFilter: ColorFilter.mode(
+                    navIndex == 3 ? AppColors.primary : Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
     );

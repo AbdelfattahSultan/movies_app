@@ -12,6 +12,8 @@ import 'package:movies_app/features/authentication/presentation/auth_cubite/lang
 import 'package:movies_app/features/onboarding/presentation/screen/intro_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/onBoarding.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
+import 'features/home_screen/tabs/profile_tab/presentation/screens/profile/profile_screen.dart';
+import 'features/home_screen/tabs/profile_tab/presentation/screens/profile/update_profile_screen.dart';
 
 void main() {
   configureDependencies();
@@ -20,7 +22,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,6 +40,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.homeTab: (context) => const HomeTab(),
         AppRoutes.forgetPassword: (context) => const ForgetPasswordScreen(),
         AppRoutes.homeScreen: (context) => const HomeScreen(),
+        AppRoutes.profileScreen: (context) => const ProfileScreen(),
+        AppRoutes.updateProfileScreen: (context) => const UpdateProfileScreen(),
       },
       initialRoute: AppRoutes.onBoarding,
     );
