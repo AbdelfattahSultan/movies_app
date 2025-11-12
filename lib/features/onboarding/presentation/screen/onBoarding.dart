@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/common_widgets/custom_button.dart';
 import 'package:movies_app/core/config/app_images.dart';
+
 import 'package:movies_app/core/config/app_routes.dart';
 
 class Onboarding extends StatelessWidget {

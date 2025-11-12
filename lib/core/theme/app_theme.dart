@@ -8,5 +8,12 @@ class AppTheme {
       brightness: Brightness.dark,
     ),
     scaffoldBackgroundColor: const Color(0XFF121312),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      type: BottomNavigationBarType.fixed,
+       showSelectedLabels: false,
+  showUnselectedLabels: false,
+      backgroundColor:  const Color(0XFF121312),
+      
+    )
   );
 }
