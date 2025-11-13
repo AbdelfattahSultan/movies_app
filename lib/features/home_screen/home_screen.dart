@@ -5,7 +5,7 @@ import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/screens/HomeTab.dart';
 import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/browse_tap.dart';
 import 'package:movies_app/features/home_screen/tabs/search_tab/presentation/screens/search_tap.dart';
-import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/profile/profile_screen.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeTab(),
     SearchTap(),
     BrowseTap(),
-    SizedBox(), // placeholder للـ Profile
+    ProfileScreen(),
   ];
 
   @override
@@ -46,27 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           clipBehavior: Clip.antiAlias,
           child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: Colors.white,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
             currentIndex: navIndex,
-            elevation: 0,
             onTap: (index) {
-              if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                );
-              } else {
+            
                 setState(() {
                   navIndex = index;
                 });
-              }
+              
             },
             items: [
               BottomNavigationBarItem(

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
-import 'package:movies_app/features/profile/data/models/user_model.dart';
-import 'package:movies_app/features/profile/data/repositories/profile_repository.dart';
-import 'package:movies_app/features/profile/logic/cubit/profile_cubit.dart';
-import 'package:movies_app/features/profile/logic/cubit/profile_state.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
 import 'update_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -378,98 +377,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
             return const SizedBox.shrink();
           },
-        ),
-        bottomNavigationBar: SafeArea(
-          minimum: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
-          child: Container(
-            height: 63,
-            decoration: BoxDecoration(
-              color: AppColors.darkGray,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: AppColors.darkGray,
-                selectedItemColor: AppColors.primary,
-                unselectedItemColor: Colors.white,
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                currentIndex: selectedBottomIndex,
-                onTap: (index) {
-                  setState(() {
-                    selectedBottomIndex = index;
-                  });
-                  switch (index) {
-                    case 0:
-                      Navigator.pushNamed(context, AppRoutes.homeScreen);
-                      break;
-                    case 3:
-                      Navigator.pushNamed(context, AppRoutes.profileScreen);
-                      break;
-                  }
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AppImages.homeIcon,
-                      colorFilter: ColorFilter.mode(
-                        selectedBottomIndex == 0
-                            ? AppColors.primary
-                            : Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AppImages.searchIcon,
-                      colorFilter: ColorFilter.mode(
-                        selectedBottomIndex == 1
-                            ? AppColors.primary
-                            : Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: 'Search',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AppImages.exploreIcon,
-                      colorFilter: ColorFilter.mode(
-                        selectedBottomIndex == 2
-                            ? AppColors.primary
-                            : Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: 'Explore',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AppImages.profileIcon,
-                      colorFilter: ColorFilter.mode(
-                        selectedBottomIndex == 3
-                            ? AppColors.primary
-                            : Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: 'Profile',
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );

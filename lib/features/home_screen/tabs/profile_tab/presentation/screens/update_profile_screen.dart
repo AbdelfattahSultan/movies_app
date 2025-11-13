@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
-import 'package:movies_app/features/profile/data/models/user_model.dart';
-import 'package:movies_app/features/profile/logic/cubit/profile_cubit.dart';
-import 'package:movies_app/features/profile/logic/cubit/profile_state.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -65,16 +65,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       child: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdated) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              Navigator.pushReplacementNamed(
-                context,
-                AppRoutes.profileScreen,
-                arguments: state.user,
-              );
+            Future.delayed(const Duration(milliseconds: 300), () {
+              context.read<ProfileCubit>().getProfile();
+              Navigator.pop(context);
             });
           } else if (state is ProfileDeleted) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              Navigator.pushReplacementNamed(context, AppRoutes.profileScreen);
+            Future.delayed(const Duration(milliseconds: 300), () {
+              Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
             });
           }
         },
@@ -147,7 +144,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.resetPasswordScreen,
+                            );
+                          },
                           child: Text(
                             "Reset Password",
                             style: GoogleFonts.roboto(
@@ -184,9 +186,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       const SizedBox(height: 16),
                       InkWell(
                         onTap: () {
-                          if (nameController.text.trim().isEmpty) {
-                            return;
-                          }
+                          if (nameController.text.trim().isEmpty) return;
                           if (phoneController.text.trim().isEmpty ||
                               phoneController.text.length < 10) {
                             return;
@@ -197,9 +197,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             phone: phoneController.text,
                             avaterId: selectedAvatar + 1,
                           );
-                          context.read<ProfileCubit>().updateProfile(
-                            updatedUser,
-                          );
+                          context.read<ProfileCubit>().updateProfile(updatedUser);
                         },
                         child: Container(
                           height: 56,
@@ -240,8 +238,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
@@ -286,12 +283,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   }
 
   Widget _buildTextField(
-      BuildContext context, {
-        required TextEditingController controller,
-        required String icon,
-        required String hint,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    BuildContext context, {
+    required TextEditingController controller,
+    required String icon,
+    required String hint,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Container(
       height: 56,
       decoration: BoxDecoration(

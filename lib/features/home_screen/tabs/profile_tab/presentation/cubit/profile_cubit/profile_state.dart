@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:movies_app/features/profile/data/models/user_model.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 
 abstract class ProfileState extends Equatable {
   const ProfileState();

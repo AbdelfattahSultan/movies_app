@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Login Successful. Welcome!")),
               );
-              Navigator.pushReplacementNamed(context, AppRoutes.registerScreen);
+              Navigator.pushReplacementNamed(context, AppRoutes.homeScreen);
             } else if (state is LoginFailureState) {
               ScaffoldMessenger.of(
                 context,
@@ -117,20 +117,16 @@ class _LoginState extends State<Login> {
                     ),
                     (state is LoginLoadingState)
                         ? const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    )
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          )
                         : CustomButton(
                             onTap: () {
                               if (checkValidate()) {
                                 context.read<LoginCubit>().login(
                                   email: emailController.text,
                                   password: passwordController.text,
-                                );
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  AppRoutes.homeScreen,
                                 );
                               }
                             },
