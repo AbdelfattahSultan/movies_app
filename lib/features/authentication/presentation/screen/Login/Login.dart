@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Login Successful. Welcome!")),
               );
-              Navigator.pushReplacementNamed(context, AppRoutes.registerScreen);
+              Navigator.pushReplacementNamed(context, AppRoutes.homeScreen);
             } else if (state is LoginFailureState) {
               ScaffoldMessenger.of(
                 context,
@@ -102,7 +102,12 @@ class _LoginState extends State<Login> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.forgetPassword,
+                            );
+                          },
                           child: Text(
                             l10n.forgetPass,
                             style: TextStyle(color: AppColors.primary),
