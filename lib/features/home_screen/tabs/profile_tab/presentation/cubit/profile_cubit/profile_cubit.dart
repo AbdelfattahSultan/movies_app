@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movies_app/features/profile/data/models/user_model.dart';
-import 'package:movies_app/features/profile/data/repositories/profile_repository.dart';
+import 'package:movies_app/core/utils/token_helper.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -31,6 +32,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(ProfileLoading());
     try {
       await profileRepository.deleteProfile();
+      await TokenHelper.deleteToken();
       emit(ProfileDeleted());
     } catch (e) {
       emit(ProfileError('Failed to delete profile: $e'));

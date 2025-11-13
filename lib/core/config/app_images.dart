@@ -10,10 +10,10 @@ class AppImages {
   static const String avatar9 = "assets/images/avatar_9.png";
   static const String userIcon = "assets/images/userIcon.svg";
   static const String phoneIcon = "assets/images/phoneIcon.svg";
-  static const String homeIcon ="assets/images/homeIcon.svg";
-  static const String searchIcon ="assets/images/searchIcon.svg";
-  static const String exploreIcon ="assets/images/exploreIcon.svg";
-  static const String profileIcon ="assets/images/profileIcon.svg";
+  static const String homeIcon = "assets/images/homeIcon.svg";
+  static const String searchIcon = "assets/images/searchIcon.svg";
+  static const String exploreIcon = "assets/images/exploreIcon.svg";
+  static const String profileIcon = "assets/images/profileIcon.svg";
   static const String logo = "assets/images/logo.png";
   static const String google = "assets/icons/google.png";
   static const String back = "assets/images/back.png";
@@ -26,5 +26,5 @@ class AppImages {
   static const String availableNow = "assets/images/AvailableNow.png";
   static const String back1 = "assets/images/back.jpg";
   static const String watchNow = "assets/images/WatchNow.png";
-
+  static const String forgetPassWord = "assets/images/forget_password.png";
 }

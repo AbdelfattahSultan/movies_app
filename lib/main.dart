@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/features/authentication/forget_password/view/forget_password_screen.dart';
+import 'package:movies_app/features/authentication/presentation/screen/forget_password/forget_password_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/core/di/Di.dart';
 import 'package:movies_app/core/config/app_routes.dart';
@@ -9,13 +9,15 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/screen
 import 'package:movies_app/features/authentication/presentation/screen/Login/Login.dart';
 import 'package:movies_app/features/authentication/presentation/screen/Register/Register.dart';
 import 'package:movies_app/features/authentication/presentation/auth_cubite/lang/cubite/lan_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/rest_password_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/intro_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/onBoarding.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
-import 'features/home_screen/tabs/profile_tab/presentation/screens/profile/profile_screen.dart';
-import 'features/home_screen/tabs/profile_tab/presentation/screens/profile/update_profile_screen.dart';
+import 'features/home_screen/tabs/profile_tab/presentation/screens/profile_screen.dart';
+import 'features/home_screen/tabs/profile_tab/presentation/screens/update_profile_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
   runApp(BlocProvider(create: (context) => LanCubit(), child: const MyApp()));
 }
@@ -41,9 +43,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.forgetPassword: (context) => const ForgetPasswordScreen(),
         AppRoutes.homeScreen: (context) => const HomeScreen(),
         AppRoutes.profileScreen: (context) => const ProfileScreen(),
+        AppRoutes.resetPasswordScreen: (context) => const ResetPasswordScreen(),
         AppRoutes.updateProfileScreen: (context) => const UpdateProfileScreen(),
       },
-      initialRoute: AppRoutes.onBoarding,
+      initialRoute: AppRoutes.homeScreen,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movies_app/core/utils/token_helper.dart';
 import 'package:movies_app/features/authentication/domain/auth_%20repository/auth_%20repository.dart';
 import 'package:movies_app/features/authentication/presentation/auth_cubite/login_cubit/login_state.dart';
 
@@ -20,7 +21,8 @@ class LoginCubit extends Cubit<LoginState> {
         (l) {
           if (!isClosed) emit(LoginFailureState(errMessage: l.errMessage));
         },
-        (r) {
+        (r) async {
+          await TokenHelper.saveToken(r.token ?? "");
           if (!isClosed) emit(LoginSuccessState(loginModel: r));
         },
       );
