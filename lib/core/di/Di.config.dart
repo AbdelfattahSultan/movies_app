@@ -14,25 +14,25 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:movies_app/core/di/DioModule.dart' as _i660;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/api/Api_manger.dart'
-    as _i749;
+as _i749;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/data/data_source/movies_data_source.dart'
-    as _i325;
+as _i325;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/data/data_source/movies_data_source_impl.dart'
-    as _i916;
+as _i916;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/data/reposatry/movies_reposatry_impl.dart'
-    as _i807;
+as _i807;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/repositories/movies_reposatry.dart'
-    as _i509;
+as _i509;
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_cubit.dart'
-    as _i336;
+as _i336;
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/reset_password_repo/reset_password_repo.dart'
-    as _i67;
+as _i67;
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/reset_password_repo/reset_password_repo_impl.dart'
-    as _i587;
+as _i587;
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/reset_password_cubite/reset_password_cubite.dart'
-    as _i139;
+as _i139;
 import 'package:movies_app/features/home_screen/tabs/profile_tab/rest_data/rest_data_source.dart'
-    as _i543;
+as _i543;
 import 'package:movies_app/features/home_screen/tabs/profile_tab/rest_data/rest_data_source_impl.dart'
     as _i737;
 import 'package:movies_app/features/movie_details/api/dataSource_impl/details_data_source_impl.dart'
@@ -62,10 +62,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
     gh.lazySingleton<_i790.MovieDetailsApi>(() => _i790.MovieDetailsApi());
     gh.factory<_i325.MoviesDataSource>(
-      () => _i916.MoviesDataSourceImpl(gh<_i749.ApiManagerHomeTab>()),
+          () => _i916.MoviesDataSourceImpl(gh<_i749.ApiManagerHomeTab>()),
     );
     gh.factory<_i509.MoviesReposatry>(
-      () => _i807.MoviesReposatryImpl(gh<_i325.MoviesDataSource>()),
+          () => _i807.MoviesReposatryImpl(gh<_i325.MoviesDataSource>()),
     );
     gh.lazySingleton<_i1035.DetailsDataSource>(
       () => _i109.DetailsDataSourceImpl(gh<_i790.MovieDetailsApi>()),
@@ -76,7 +76,7 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.lazySingleton<_i543.RestDataSource>(
-      () => _i737.RestDataSourceImpl(dio: gh<_i361.Dio>()),
+          () => _i737.RestDataSourceImpl(dio: gh<_i361.Dio>()),
     );
     gh.factory<_i880.CubitMovieDetails>(
       () => _i880.CubitMovieDetails(gh<_i718.MovieDetailsRepo>()),
@@ -85,13 +85,13 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i491.FavoriteCubit(gh<_i718.MovieDetailsRepo>()),
     );
     gh.factory<_i336.MoviesCubit>(
-      () => _i336.MoviesCubit(gh<_i509.MoviesReposatry>()),
+          () => _i336.MoviesCubit(gh<_i509.MoviesReposatry>()),
     );
     gh.lazySingleton<_i67.ResetPasswordRepo>(
-      () => _i587.ResetPasswordRepoImpl(dataSource: gh<_i543.RestDataSource>()),
+          () => _i587.ResetPasswordRepoImpl(dataSource: gh<_i543.RestDataSource>()),
     );
     gh.factory<_i139.ResetPasswordCubit>(
-      () => _i139.ResetPasswordCubit(
+          () => _i139.ResetPasswordCubit(
         resetPasswordRepo: gh<_i67.ResetPasswordRepo>(),
       ),
     );

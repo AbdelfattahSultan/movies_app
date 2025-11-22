@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/screens/HomeTab.dart';
-import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/browse_tap.dart';
+import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/Browse_tab.dart';
 import 'package:movies_app/features/home_screen/tabs/search_tab/presentation/screens/search_tap.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/profile_screen.dart';
 
@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> pages = const [
     HomeTab(),
     SearchTap(),
-    BrowseTap(),
+    BrowseTab(),
     ProfileScreen(),
   ];
 

@@ -213,7 +213,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              "Update Data",
+                              "Update data",
                               style: GoogleFonts.roboto(
                                 color: AppColors.eerieBlack,
                                 fontSize: 20,
