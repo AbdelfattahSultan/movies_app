@@ -9,6 +9,7 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/screen
 import 'package:movies_app/features/authentication/presentation/screen/Login/Login.dart';
 import 'package:movies_app/features/authentication/presentation/screen/Register/Register.dart';
 import 'package:movies_app/features/authentication/presentation/auth_cubite/lang/cubite/lan_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/Browse_tab.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/rest_password_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/intro_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/onBoarding.dart';
@@ -45,8 +46,9 @@ class MyApp extends StatelessWidget {
         AppRoutes.profileScreen: (context) => const ProfileScreen(),
         AppRoutes.resetPasswordScreen: (context) => const ResetPasswordScreen(),
         AppRoutes.updateProfileScreen: (context) => const UpdateProfileScreen(),
+        AppRoutes.browseTab : (context) =>  BrowseTab(),
       },
-      initialRoute: AppRoutes.homeScreen,
+      initialRoute: AppRoutes.registerScreen,
     );
   }
 }

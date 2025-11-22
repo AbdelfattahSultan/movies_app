@@ -23,9 +23,9 @@ class ApiManagerHomeTab {
       "limit": limit,
       "sort_by": dateAdd,
     };
-    var response = await _dio.get("https://yts.mx/api/v2/list_movies.json",
+    var response = await _dio.get("https://yts.lt/api/v2/list_movies.json",
         queryParameters: q);
-   MoviesResponse moviesResponse = MoviesResponse.fromJson(response.data);
+    MoviesResponse moviesResponse = MoviesResponse.fromJson(response.data);
     return moviesResponse.data.movies.map((e) => e.toMovie()).toList();
 
   }
@@ -35,10 +35,11 @@ class ApiManagerHomeTab {
       "limit": limit,
       "genre": genre,
     };
-    var response = await _dio.get("https://yts.mx/api/v2/list_movies.json",
+    var response = await _dio.get("https://yts.lt/api/v2/list_movies.json",
         queryParameters: q);
     MoviesResponse moviesResponse = MoviesResponse.fromJson(response.data);
     return moviesResponse.data.movies.map((e) => e.toMovie()).toList();
 
   }
+
 }
