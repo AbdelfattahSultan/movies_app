@@ -10,4 +10,6 @@ abstract class AppRoutes {
   static const String introScreen = '/intro_screen';
   static const String forgetPassword = '/forgetPassword';
   static const String resetPasswordScreen = '/resetPasswordScreen';
+  static const String browseTab = '/browseTab';
+
 }
