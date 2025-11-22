@@ -7,8 +7,11 @@ import 'package:movies_app/core/di/Di.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_state.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/CategorySection.dart';
-import '../widget/carousel_card.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/carousel_card.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -51,16 +54,16 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    MoviesCubit movies = getIt.get<MoviesCubit>();
+    final moviesCubit = getIt.get<MoviesCubit>();
     final size = MediaQuery.of(context).size;
 
     return BlocProvider(
       create: (context) {
-        movies.getTopMovies(20, "2024-12-01");
+        moviesCubit.getTopMovies();
         for (var genre in genresToDisplay) {
-          movies.grtMoviesByGenre(10, genre.toLowerCase());
+          moviesCubit.grtMoviesByGenre(10, genre.toLowerCase());
         }
-        return movies;
+        return moviesCubit;
       },
       child: Scaffold(
         body: SingleChildScrollView(
@@ -110,8 +113,9 @@ class _HomeTabState extends State<HomeTab> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Image(image: AssetImage(AppImages.availableNow)),
-
+                              const Image(
+                                image: AssetImage(AppImages.availableNow),
+                              ),
                               BlocBuilder<MoviesCubit, MoviesState>(
                                 builder: (context, state) {
                                   if (state is MoviesLoading) {
@@ -138,8 +142,37 @@ class _HomeTabState extends State<HomeTab> {
                                       ),
                                       items: topMovies.map((movie) {
                                         return CarouselCard(
-                                          image: movie.image,
-                                          rating: movie.rating,
+                                          image: movie.image ?? "",
+                                          rating: movie.rating ?? 0.0,
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => MultiBlocProvider(
+                                                  providers: [
+                                                    BlocProvider(
+                                                      create: (_) =>
+                                                          getIt<
+                                                              CubitMovieDetails
+                                                            >()
+                                                            ..loadMovie(
+                                                              movie.id
+                                                                  .toString(),
+                                                            ),
+                                                    ),
+                                                    BlocProvider(
+                                                      create: (_) =>
+                                                          getIt<
+                                                            FavoriteCubit
+                                                          >(),
+                                                    ),
+                                                  ],
+                                                  child:
+                                                      const MovieDetailsScreen(),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       }).toList(),
                                     );
@@ -154,8 +187,9 @@ class _HomeTabState extends State<HomeTab> {
                                   return const SizedBox();
                                 },
                               ),
-
-                              Image(image: AssetImage(AppImages.watchNow)),
+                              const Image(
+                                image: AssetImage(AppImages.watchNow),
+                              ),
                             ],
                           ),
                         ),
@@ -164,11 +198,9 @@ class _HomeTabState extends State<HomeTab> {
                   );
                 },
               ),
-
-              ...genresToDisplay
-                  .map((genre) => _buildGenreSection(context, genre))
-                  ,
-
+              ...genresToDisplay.map(
+                (genre) => _buildGenreSection(context, genre),
+              ),
               const SizedBox(height: 20),
             ],
           ),

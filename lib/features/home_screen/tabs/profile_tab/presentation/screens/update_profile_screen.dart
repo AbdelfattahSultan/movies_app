@@ -90,7 +90,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             appBar: AppBar(
               backgroundColor: AppColors.eerieBlack,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: AppColors.primary, size: 30),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: AppColors.primary,
+                  size: 30,
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
               title: TextButton(
@@ -197,7 +201,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             phone: phoneController.text,
                             avaterId: selectedAvatar + 1,
                           );
-                          context.read<ProfileCubit>().updateProfile(updatedUser);
+                          context.read<ProfileCubit>().updateProfile(
+                            updatedUser,
+                          );
                         },
                         child: Container(
                           height: 56,
@@ -238,11 +244,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
                         itemCount: avatars.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
@@ -299,11 +306,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 16),
-            child: SvgPicture.asset(
-              icon,
-              width: 30,
-              height: 30,
-            ),
+            child: SvgPicture.asset(icon, width: 30, height: 30),
           ),
           const SizedBox(width: 12),
           Expanded(

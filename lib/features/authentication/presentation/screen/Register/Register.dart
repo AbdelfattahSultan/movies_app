@@ -20,6 +20,7 @@ class Register extends StatefulWidget {
   @override
   State<Register> createState() => _RegisterState();
 }
+
 class _RegisterState extends State<Register> {
   late final TextEditingController nameController;
   late final TextEditingController phoneController;
@@ -129,7 +130,7 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                     Text(
+                    Text(
                       l10n.chooseAvatar,
                       style: TextStyle(
                         color: Colors.white,
@@ -222,7 +223,7 @@ class _RegisterState extends State<Register> {
                                     AppRoutes.loginScreen,
                                   );
                                 },
-                                child:  Text(
+                                child: Text(
                                   l10n.login,
                                   style: TextStyle(color: AppColors.primary),
                                 ),

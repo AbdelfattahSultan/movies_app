@@ -12,6 +12,7 @@ import 'package:movies_app/features/authentication/presentation/auth_cubite/lang
 import 'package:movies_app/features/home_screen/tabs/browse_tab/presentation/screens/Browse_tab.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/rest_password_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/intro_screen.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 import 'package:movies_app/features/onboarding/presentation/screen/onBoarding.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'features/home_screen/tabs/profile_tab/presentation/screens/profile_screen.dart';
@@ -20,7 +21,14 @@ import 'features/home_screen/tabs/profile_tab/presentation/screens/update_profil
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
-  runApp(BlocProvider(create: (context) => LanCubit(), child: const MyApp()));
+  runApp(
+  MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => LanCubit()),
+    ],
+    child: const MyApp(),
+  ),
+);
 }
 
 class MyApp extends StatelessWidget {
@@ -46,6 +54,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.profileScreen: (context) => const ProfileScreen(),
         AppRoutes.resetPasswordScreen: (context) => const ResetPasswordScreen(),
         AppRoutes.updateProfileScreen: (context) => const UpdateProfileScreen(),
+        AppRoutes.movieDetailScreen: (context) => const MovieDetailsScreen(),
         AppRoutes.browseTab : (context) =>  BrowseTab(),
       },
       initialRoute: AppRoutes.registerScreen,

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/rest_data/rest_data_source.dart';
+
 @LazySingleton(as: RestDataSource)
 class RestDataSourceImpl implements RestDataSource {
   final Dio dio;
