@@ -38,9 +38,10 @@ class MoviesData {
       movieCount: json['movie_count'] ?? 0,
       limit: json['limit'] ?? 0,
       pageNumber: json['page_number'] ?? 0,
-      movies: (json['movies'] as List<dynamic>?)
-          ?.map((m) => MovieModel.fromJson(m))
-          .toList() ??
+      movies:
+          (json['movies'] as List<dynamic>?)
+              ?.map((m) => MovieModel.fromJson(m))
+              .toList() ??
           [],
     );
   }
@@ -73,14 +74,15 @@ class MovieModel {
     required this.torrents,
   });
 
-  Movie toMovie(){
+  Movie toMovie() {
     return Movie(
       id: id,
       title: title,
       rating: rating,
       image: largeCoverImage,
       year: year,
-      genres: genres );
+      genres: genres,
+    );
   }
 
   factory MovieModel.fromJson(Map<String, dynamic> json) {
@@ -95,9 +97,10 @@ class MovieModel {
       language: json['language'] ?? '',
       backgroundImage: json['background_image'] ?? '',
       largeCoverImage: json['large_cover_image'] ?? '',
-      torrents: (json['torrents'] as List<dynamic>?)
-          ?.map((t) => TorrentModel.fromJson(t))
-          .toList() ??
+      torrents:
+          (json['torrents'] as List<dynamic>?)
+              ?.map((t) => TorrentModel.fromJson(t))
+              .toList() ??
           [],
     );
   }

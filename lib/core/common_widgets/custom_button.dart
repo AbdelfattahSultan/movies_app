@@ -4,9 +4,16 @@ import 'package:movies_app/core/config/app_colors.dart';
 // ignore: must_be_immutable
 class CustomButton extends StatelessWidget {
   String content;
-
+  Color? color;
+  bool? isRed;
   VoidCallback onTap;
-  CustomButton({super.key, required this.onTap, required this.content});
+  CustomButton({
+    super.key,
+    required this.onTap,
+    required this.content,
+    this.color,
+    this.isRed = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +22,7 @@ class CustomButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onTap,
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: color ?? AppColors.primary,
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -23,7 +30,11 @@ class CustomButton extends StatelessWidget {
         ),
         child: Text(
           content,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: isRed == true ? AppColors.white : AppColors.darkGray,
+          ),
         ),
       ),
     );

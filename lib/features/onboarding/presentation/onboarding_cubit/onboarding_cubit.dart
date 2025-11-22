@@ -11,6 +11,7 @@ class OnboardingCubit extends Cubit<int> {
   void onPageChanged(int index) {
     emit(index);
   }
+
   void nextPage(BuildContext context) {
     int totalPage = OnboardingModel.onboardingList.length;
 

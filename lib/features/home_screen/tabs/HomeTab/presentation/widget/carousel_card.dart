@@ -5,41 +5,42 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget
 class CarouselCard extends StatelessWidget {
   final String image;
   final double rating;
+  final VoidCallback onTap;
 
   const CarouselCard({
     super.key,
     required this.image,
-    this.rating = 7.7,
+    required this.rating,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Container(
-      width: size.width,
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Stack(
-          children: [
-            CachedNetworkImage(
-              imageUrl: image,
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
-              placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) =>
-              const Icon(Icons.error, color: Colors.red),
-            ),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: size.width,
+        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Stack(
+            children: [
+              CachedNetworkImage(
+                imageUrl: image,
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.error, color: Colors.red),
+              ),
 
-            Positioned(
-              top: 12,
-              left: 12,
-              child: RatingBadge(rating: rating),
-            ),
-          ],
+              Positioned(top: 12, left: 12, child: RatingBadge(rating: rating)),
+            ],
+          ),
         ),
       ),
     );

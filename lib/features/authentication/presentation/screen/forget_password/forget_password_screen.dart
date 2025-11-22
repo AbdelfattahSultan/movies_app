@@ -27,7 +27,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           'Forget Password',
           style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
         ),
-        
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

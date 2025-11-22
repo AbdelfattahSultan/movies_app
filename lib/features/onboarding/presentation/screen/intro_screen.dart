@@ -38,7 +38,6 @@ class IntroScreen extends StatelessWidget {
                 CustomButton(
                   onTap: () {
                     cubit.nextPage(context);
-                    
                   },
                   content: isLastPage ? "Get Started" : "Next",
                 ),

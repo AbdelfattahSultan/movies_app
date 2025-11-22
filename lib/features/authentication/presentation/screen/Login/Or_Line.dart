@@ -7,7 +7,7 @@ class OrLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var l10n =AppLocalizations.of(context);
+    var l10n = AppLocalizations.of(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
       child: Row(

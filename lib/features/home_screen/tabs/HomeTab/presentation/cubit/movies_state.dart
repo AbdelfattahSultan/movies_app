@@ -1,9 +1,9 @@
-
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 
 abstract class MoviesState {}
 
 class MoviesInti extends MoviesState {}
+
 class MoviesLoading extends MoviesState {}
 
 class MoviesSuccess extends MoviesState {

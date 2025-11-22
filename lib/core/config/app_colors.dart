@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class AppColors {
   static const Color white = Color(0xffFFFFFF);
   static const Color red = Color(0xffE82626);
