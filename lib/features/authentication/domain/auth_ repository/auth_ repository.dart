@@ -13,7 +13,7 @@ abstract class AuthRepository {
     required int avatarId,
   });
 
-    Future<Either<Failure, LoginModel>> login({
+  Future<Either<Failure, LoginModel>> login({
     required String email,
     required String password,
   });

@@ -4,18 +4,16 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/data/data_source/mo
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 
 @Injectable(as: MoviesDataSource)
-class MoviesDataSourceImpl implements MoviesDataSource{
-final ApiManagerHomeTab apiManager ;
+class MoviesDataSourceImpl implements MoviesDataSource {
+  final ApiManagerHomeTab apiManager;
   MoviesDataSourceImpl(this.apiManager);
   @override
-  Future<List<Movie>> getTopMovies(int limit, String dateAdd)async {
-  return  await apiManager.getTopMovies(limit, dateAdd);
-
+  Future<List<Movie>> getTopMovies() async {
+    return await apiManager.getTopMovies();
   }
-@override
-  Future<List<Movie>> getMoviesByGenre(int limit, String genre)async {
-  return  await apiManager.getMoviesByGenre(limit, genre);
 
-}
-
+  @override
+  Future<List<Movie>> getMoviesByGenre(int limit, String genre) async {
+    return await apiManager.getMoviesByGenre(limit, genre);
+  }
 }

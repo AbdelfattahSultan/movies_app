@@ -40,9 +40,12 @@ class Onboarding extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                CustomButton(onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.introScreen);
-                }, content: "Explore Now"),
+                CustomButton(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.introScreen);
+                  },
+                  content: "Explore Now",
+                ),
               ],
             ),
           ),

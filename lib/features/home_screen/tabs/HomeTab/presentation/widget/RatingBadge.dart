@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class RatingBadge extends StatelessWidget {
   final double rating;
 
-  const RatingBadge({
-    super.key,
-    required this.rating,
-  });
+  const RatingBadge({super.key, required this.rating});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +24,7 @@ class RatingBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 3),
-          const Icon(
-            Icons.star,
-            size: 14,
-            color: Colors.yellow,
-          ),
+          const Icon(Icons.star, size: 14, color: Colors.yellow),
         ],
       ),
     );

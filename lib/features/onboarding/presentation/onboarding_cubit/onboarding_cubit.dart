@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/core/config/app_routes.dart';
+import 'package:movies_app/core/utils/is_first_time.dart';
 import 'package:movies_app/features/onboarding/data/model/onBoarding_model.dart';
 
 class OnboardingCubit extends Cubit<int> {
@@ -11,6 +12,7 @@ class OnboardingCubit extends Cubit<int> {
   void onPageChanged(int index) {
     emit(index);
   }
+
   void nextPage(BuildContext context) {
     int totalPage = OnboardingModel.onboardingList.length;
 
@@ -21,6 +23,7 @@ class OnboardingCubit extends Cubit<int> {
       );
     } else {
       Navigator.pushReplacementNamed(context, AppRoutes.loginScreen);
+      IsFirstTime.setNotFirstTime();
     }
   }
 
@@ -31,7 +34,7 @@ class OnboardingCubit extends Cubit<int> {
     );
   }
 
-  Future<void> dispose() async {
+  Future<void> dispose() {
     pageController.dispose();
     return super.close();
   }

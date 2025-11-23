@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
+
+import 'package:movies_app/core/di/Di.dart';
+import 'package:movies_app/core/utils/token_helper.dart';
+
+import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/moves_card.dart';
+
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
-import 'update_profile_screen.dart';
+
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_state.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/update_profile_screen.dart';
+
+import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,8 +33,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int selectedProfileTabIndex = 0;
-  int selectedBottomIndex = 3;
+  int selectedIndex = 0;
 
   final List<String> avatars = [
     AppImages.avatar1,
@@ -33,8 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     AppImages.avatar9,
   ];
 
-  String getAvatarImage(int avatarId) {
-    if (avatarId >= 1 && avatarId <= avatars.length) {
+  String getAvatarImage(int? avatarId) {
+    if (avatarId != null && avatarId >= 1 && avatarId <= avatars.length) {
       return avatars[avatarId - 1];
     } else {
       return avatars[0];
@@ -43,46 +57,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(ProfileRepository())..getProfile(),
+    final dio = Dio();
+    final favoritesRepo = FavoritesRepositoryImpl(FavoritesDataSourceImpl(dio));
+    final historyLocal = HistoryLocalDataSource();
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ProfileCubit(ProfileRepository())..getProfile()),
+        BlocProvider(create: (_) => FavoritesCubit(favoritesRepo)..loadFavorites()),
+        BlocProvider(create: (_) => HistoryCubit(historyLocal)..loadHistory()),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.eerieBlack,
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.yellow),
-              );
-            } else if (state is ProfileError) {
+              return const Center(child: CircularProgressIndicator(color: Colors.yellow));
+            }
+
+            if (state is ProfileError) {
               return Center(
-                child: Text(
-                  "Error: ${state.message}",
-                  style: const TextStyle(color: Colors.red),
-                ),
+                child: Text("Error: ${state.message}", style: const TextStyle(color: Colors.red)),
               );
             } else if (state is ProfileLoaded) {
               UserModel user = state.user;
+              List<Movie> favorites = state.favorites;
+
+              List<Movie> historyList = [];
+              final historyState = context.watch<HistoryCubit>().state;
+              if (historyState is HistoryLoaded) {
+                historyList = historyState.movies;
+              }
+
+              final int watchListCount = favorites.length;
+              final int historyCount = historyList.length;
+
               return Column(
                 children: [
                   Container(
                     color: AppColors.darkGray,
-                    padding: const EdgeInsets.only(
-                      top: 52,
-                      left: 16,
-                      right: 16,
-                    ),
+                    padding: const EdgeInsets.only(top: 52, left: 16, right: 16, bottom: 12),
                     child: Column(
                       children: [
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
+                            // Avatar + Name
                             Expanded(
                               child: Column(
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(60),
                                     child: Image.asset(
-                                      getAvatarImage(user.avaterId),
+                                      getAvatar(user.avaterId),
                                       width: 95,
                                       height: 95,
                                       fit: BoxFit.cover,
@@ -92,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     user.name,
                                     style: GoogleFonts.roboto(
-                                      color: AppColors.white,
+                                      color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -100,19 +128,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+                            // Watch List count
                             Expanded(
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "12",
-                                    style: TextStyle(
+                                    watchListCount.toString(),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    "Wish List",
+                                  const Text(
+                                    "Watch List",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -121,18 +150,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+                            // History count
                             Expanded(
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "10",
-                                    style: TextStyle(
+                                    historyCount.toString(),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     "History",
                                     style: TextStyle(
                                       color: Colors.white,
@@ -144,14 +174,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
+
+                        // Edit + Logout
                         Row(
                           children: [
                             Expanded(
                               flex: 2,
                               child: InkWell(
                                 onTap: () async {
-                                  final updatedUser = await Navigator.push(
+                                  final updated = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => BlocProvider.value(
@@ -162,10 +195,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   );
 
-                                  if (updatedUser is UserModel) {
-                                    setState(() {
-                                      user = updatedUser;
-                                    });
+                                  if (updated is UserModel) {
+                                    context.read<ProfileCubit>().updateProfile(updated);
                                   }
                                 },
                                 child: Container(
@@ -175,14 +206,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: const Center(
-                                    child: Text(
-                                      "Edit Profile",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                    child: Text("Edit Profile",
+                                        style: TextStyle(color: Colors.black, fontSize: 18)),
                                   ),
                                 ),
                               ),
@@ -199,7 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      title: const Text(
+                                      title: Text(
                                         "Log Out",
                                         style: TextStyle(
                                           color: Colors.white,
@@ -222,8 +247,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
                                         TextButton(
-                                          onPressed: () {
+                                          onPressed: () async {
                                             Navigator.pop(context);
+                                            await TokenHelper.deleteToken();
                                             Navigator.pushNamedAndRemoveUntil(
                                               context,
                                               AppRoutes.loginScreen,
@@ -249,23 +275,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: const Center(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          "Exit",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        Text("Exit",
+                                            style:
+                                            TextStyle(color: Colors.white, fontSize: 18)),
                                         SizedBox(width: 6),
-                                        Icon(
-                                          Icons.exit_to_app,
-                                          color: Colors.white,
-                                          size: 22,
-                                        ),
+                                        Icon(Icons.exit_to_app,
+                                            color: Colors.white, size: 22),
                                       ],
                                     ),
                                   ),
@@ -274,37 +291,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
+
+                        // Tabs: Watch List / History
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 0),
+                              onTap: () => setState(() => selectedIndex = 0),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.list,
-                                    color: AppColors.primary,
-                                    size: 40,
-                                  ),
-                                  Text(
-                                    "Watch List",
-                                    style: GoogleFonts.roboto(
-                                      color: AppColors.white,
-                                      fontSize: 20,
-                                    ),
-                                  ),
+                                  Icon(Icons.list,
+                                      color: AppColors.primary, size: 40),
+                                  Text("Watch List",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 20)),
                                 ],
                               ),
                             ),
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 1),
+                              onTap: () => setState(() => selectedIndex = 1),
                               child: Column(
                                 children: [
                                   Icon(
-                                    Icons.folder,
+                                    Icons.history,
                                     color: AppColors.primary,
                                     size: 40,
                                   ),
@@ -320,21 +331,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+
+                        const SizedBox(height: 5),
+
                         AnimatedAlign(
                           duration: const Duration(milliseconds: 300),
-                          alignment: selectedProfileTabIndex == 0
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
+                          alignment:
+                          selectedIndex == 0 ? Alignment.centerLeft : Alignment.centerRight,
                           child: Container(
-                            height: 2,
+                            height: 1.5,
                             width: MediaQuery.of(context).size.width / 2,
                             color: AppColors.primary,
                           ),
                         ),
+
                       ],
                     ),
                   ),
+
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -346,35 +360,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Builder(
                           builder: (context) {
-                            final List<String> watchList = [];
-                            final List<String> historyList = [];
+                            final List<Movie> watchList = favorites;
+                            final List<Movie> historyMovies = historyList;
+
                             final currentList = selectedProfileTabIndex == 0
                                 ? watchList
-                                : historyList;
+                                : historyMovies;
+
+                            if (currentList.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  selectedProfileTabIndex == 0
+                                      ? "No movies in Watch List yet."
+                                      : "No movies in History yet.",
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                              );
+                            }
 
                             return GridView.builder(
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: currentList.length,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.65,
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 11,
+                                    mainAxisSpacing: 11,
+                                    childAspectRatio: 1 / 1.3,
                                   ),
-                              itemCount: currentList.length,
                               itemBuilder: (context, index) {
-                                return const SizedBox.shrink();
+                                final Movie movie = currentList[index];
+
+                                return MovesCard(
+                                  posterPath: movie.image ?? '',
+                                  rating: movie.rating ?? 0.0,
+                                  onTap: () {
+                                
+                                    context.read<HistoryCubit>().addMovie(
+                                      movie,
+                                    );
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiBlocProvider(
+                                          providers: [
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<CubitMovieDetails>()
+                                                    ..loadMovie(
+                                                      movie.id.toString(),
+                                                    ),
+                                            ),
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<FavoriteCubit>(),
+                                            ),
+                                          ],
+                                          child: const MovieDetailsScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                              childCount: list.length,
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               );
             }
+
             return const SizedBox.shrink();
           },
         ),
