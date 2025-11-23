@@ -59,8 +59,8 @@ class MovieDetailsScreen extends StatelessWidget {
                 final rating = (movie.rating ?? 0).toStringAsFixed(1);
 
                 final summary =
-                    (movie.descriptionIntro != null &&
-                        movie.descriptionIntro!.isNotEmpty)
+                (movie.descriptionIntro != null &&
+                    movie.descriptionIntro!.isNotEmpty)
                     ? movie.descriptionIntro!
                     : (movie.descriptionFull ?? '');
 
@@ -160,12 +160,12 @@ class MovieDetailsScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: similarMovies.length,
                               gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
-                                    childAspectRatio: 1 / 1.3,
-                                  ),
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                                childAspectRatio: 1 / 1.3,
+                              ),
                               itemBuilder: (context, index) {
                                 return MovesCard(
                                   onTap: () {
@@ -176,11 +176,11 @@ class MovieDetailsScreen extends StatelessWidget {
                                           providers: [
                                             BlocProvider(
                                               create: (_) =>
-                                                  getIt<CubitMovieDetails>()
-                                                    ..loadMovie(
-                                                      similarMovies[index].id
-                                                          .toString(),
-                                                    ),
+                                              getIt<CubitMovieDetails>()
+                                                ..loadMovie(
+                                                  similarMovies[index].id
+                                                      .toString(),
+                                                ),
                                             ),
                                             BlocProvider(
                                               create: (_) =>

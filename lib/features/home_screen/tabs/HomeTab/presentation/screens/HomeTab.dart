@@ -87,13 +87,13 @@ class _HomeTabState extends State<HomeTab> {
                         decoration: BoxDecoration(
                           image: displayImage != null && displayImage.isNotEmpty
                               ? DecorationImage(
-                                  image: NetworkImage(displayImage),
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.black.withOpacity(0.4),
-                                    BlendMode.darken,
-                                  ),
-                                )
+                            image: NetworkImage(displayImage),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.4),
+                              BlendMode.darken,
+                            ),
+                          )
                               : null,
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
@@ -152,23 +152,23 @@ class _HomeTabState extends State<HomeTab> {
                                                   providers: [
                                                     BlocProvider(
                                                       create: (_) =>
-                                                          getIt<
-                                                              CubitMovieDetails
-                                                            >()
-                                                            ..loadMovie(
-                                                              movie.id
-                                                                  .toString(),
-                                                            ),
+                                                      getIt<
+                                                          CubitMovieDetails
+                                                      >()
+                                                        ..loadMovie(
+                                                          movie.id
+                                                              .toString(),
+                                                        ),
                                                     ),
                                                     BlocProvider(
                                                       create: (_) =>
                                                           getIt<
-                                                            FavoriteCubit
+                                                              FavoriteCubit
                                                           >(),
                                                     ),
                                                   ],
                                                   child:
-                                                      const MovieDetailsScreen(),
+                                                  const MovieDetailsScreen(),
                                                 ),
                                               ),
                                             );
@@ -199,7 +199,7 @@ class _HomeTabState extends State<HomeTab> {
                 },
               ),
               ...genresToDisplay.map(
-                (genre) => _buildGenreSection(context, genre),
+                    (genre) => _buildGenreSection(context, genre),
               ),
               const SizedBox(height: 20),
             ],

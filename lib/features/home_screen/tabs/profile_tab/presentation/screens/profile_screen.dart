@@ -4,10 +4,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
+import 'package:movies_app/core/utils/token_helper.dart';
+import 'package:dio/dio.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
+import '../../../../../../core/di/Di.dart';
+import '../../../../../movie_details/presentation/cubit/cubit_movie_details.dart';
+import '../../../../../movie_details/presentation/screen/movie_details_screen.dart';
+import '../../favourites/data/data_source/favorites_data_source_impl.dart';
+import '../../favourites/data/repositories/favorites_repository_impl.dart';
+import '../../favourites/presentation/cubit/favorites_cubit.dart';
+import '../../history/data/history_local_data_source.dart';
+import '../../history/presentation/cubit/history_cubit.dart';
+import '../../history/presentation/cubit/history_state.dart';
+import '../../favourites/presentation/cubit/favorites_state.dart';
 import 'update_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,8 +31,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int selectedProfileTabIndex = 0;
-  int selectedBottomIndex = 3;
+  int selectedIndex = 0;
 
   final List<String> avatars = [
     AppImages.avatar1,
@@ -33,46 +45,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
     AppImages.avatar9,
   ];
 
-  String getAvatarImage(int avatarId) {
-    if (avatarId >= 1 && avatarId <= avatars.length) {
-      return avatars[avatarId - 1];
-    } else {
-      return avatars[0];
-    }
+  String getAvatar(int id) {
+    if (id >= 1 && id <= avatars.length) return avatars[id - 1];
+    return avatars[0];
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(ProfileRepository())..getProfile(),
+    final dio = Dio();
+    final favoritesRepo = FavoritesRepositoryImpl(FavoritesDataSourceImpl(dio));
+    final historyLocal = HistoryLocalDataSource();
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ProfileCubit(ProfileRepository())..getProfile()),
+        BlocProvider(create: (_) => FavoritesCubit(favoritesRepo)..loadFavorites()),
+        BlocProvider(create: (_) => HistoryCubit(historyLocal)..loadHistory()),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.eerieBlack,
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.yellow),
-              );
-            } else if (state is ProfileError) {
+              return const Center(child: CircularProgressIndicator(color: Colors.yellow));
+            }
+
+            if (state is ProfileError) {
               return Center(
-                child: Text(
-                  "Error: ${state.message}",
-                  style: const TextStyle(color: Colors.red),
-                ),
+                child: Text("Error: ${state.message}", style: const TextStyle(color: Colors.red)),
               );
-            } else if (state is ProfileLoaded) {
-              UserModel user = state.user;
-              return Column(
-                children: [
-                  Container(
+            }
+
+            if (state is! ProfileLoaded && state is! ProfileUpdated) {
+              return const SizedBox.shrink();
+            }
+
+            final user = state is ProfileLoaded ? state.user : (state as ProfileUpdated).user;
+
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
                     color: AppColors.darkGray,
-                    padding: const EdgeInsets.only(
-                      top: 52,
-                      left: 16,
-                      right: 16,
-                    ),
+                    padding: const EdgeInsets.only(top: 52, left: 16, right: 16, bottom: 12),
                     child: Column(
                       children: [
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -82,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(60),
                                     child: Image.asset(
-                                      getAvatarImage(user.avaterId),
+                                      getAvatar(user.avaterId),
                                       width: 95,
                                       height: 95,
                                       fit: BoxFit.cover,
@@ -92,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     user.name,
                                     style: GoogleFonts.roboto(
-                                      color: AppColors.white,
+                                      color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -100,58 +118,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+
                             Expanded(
-                              child: Column(
-                                children: const [
-                                  Text(
-                                    "12",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Wish List",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                              child: BlocBuilder<FavoritesCubit, FavoritesState>(
+                                builder: (context, fav) {
+                                  final count = fav is FavoritesLoaded ? fav.movies.length : 0;
+                                  return Column(
+                                    children: [
+                                      Text("$count",
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold)),
+                                      const Text("Wish List",
+                                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
+
                             Expanded(
-                              child: Column(
-                                children: const [
-                                  Text(
-                                    "10",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "History",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                              child: BlocBuilder<HistoryCubit, HistoryState>(
+                                builder: (context, hist) {
+                                  final count = hist is HistoryLoaded ? hist.movies.length : 0;
+                                  return Column(
+                                    children: [
+                                      Text("$count",
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold)),
+                                      const Text("History",
+                                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
+
                         Row(
                           children: [
                             Expanded(
                               flex: 2,
                               child: InkWell(
                                 onTap: () async {
-                                  final updatedUser = await Navigator.push(
+                                  final updated = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => BlocProvider.value(
@@ -162,10 +178,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   );
 
-                                  if (updatedUser is UserModel) {
-                                    setState(() {
-                                      user = updatedUser;
-                                    });
+                                  if (updated is UserModel) {
+                                    context.read<ProfileCubit>().updateProfile(updated);
                                   }
                                 },
                                 child: Container(
@@ -175,14 +189,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: const Center(
-                                    child: Text(
-                                      "Edit Profile",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                    child: Text("Edit Profile",
+                                        style: TextStyle(color: Colors.black, fontSize: 18)),
                                   ),
                                 ),
                               ),
@@ -191,55 +199,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               flex: 1,
                               child: InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      backgroundColor: AppColors.darkGray,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      title: const Text(
-                                        "Log Out",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      content: const Text(
-                                        "Are you sure you want to log out?",
-                                        style: TextStyle(color: Colors.white70),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text(
-                                            "Cancel",
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Navigator.pushNamedAndRemoveUntil(
-                                              context,
-                                              AppRoutes.loginScreen,
-                                              (route) => false,
-                                            );
-                                          },
-                                          child: Text(
-                                            "Log Out",
-                                            style: TextStyle(
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                                onTap: () async {
+                                  await TokenHelper.deleteToken();
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, AppRoutes.loginScreen, (_) => false);
                                 },
                                 child: Container(
                                   height: 50,
@@ -249,23 +212,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: const Center(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          "Exit",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        Text("Exit",
+                                            style:
+                                            TextStyle(color: Colors.white, fontSize: 18)),
                                         SizedBox(width: 6),
-                                        Icon(
-                                          Icons.exit_to_app,
-                                          color: Colors.white,
-                                          size: 22,
-                                        ),
+                                        Icon(Icons.exit_to_app,
+                                            color: Colors.white, size: 22),
                                       ],
                                     ),
                                   ),
@@ -274,108 +228,160 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 0),
+                              onTap: () => setState(() => selectedIndex = 0),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.list,
-                                    color: AppColors.primary,
-                                    size: 40,
-                                  ),
-                                  Text(
-                                    "Watch List",
-                                    style: GoogleFonts.roboto(
-                                      color: AppColors.white,
-                                      fontSize: 20,
-                                    ),
-                                  ),
+                                  Icon(Icons.list,
+                                      color: AppColors.primary, size: 40),
+                                  Text("Watch List",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 20)),
                                 ],
                               ),
                             ),
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 1),
+                              onTap: () => setState(() => selectedIndex = 1),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.folder,
-                                    color: AppColors.primary,
-                                    size: 40,
-                                  ),
-                                  Text(
-                                    "History",
-                                    style: GoogleFonts.roboto(
-                                      color: AppColors.white,
-                                      fontSize: 20,
-                                    ),
-                                  ),
+                                  Icon(Icons.folder,
+                                      color: AppColors.primary, size: 40),
+                                  Text("History",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 20)),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+
+                        const SizedBox(height: 5),
+
                         AnimatedAlign(
                           duration: const Duration(milliseconds: 300),
-                          alignment: selectedProfileTabIndex == 0
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
+                          alignment:
+                          selectedIndex == 0 ? Alignment.centerLeft : Alignment.centerRight,
                           child: Container(
-                            height: 2,
+                            height: 1.5,
                             width: MediaQuery.of(context).size.width / 2,
                             color: AppColors.primary,
                           ),
                         ),
+
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Container(
-                        color: AppColors.eerieBlack,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 20,
-                        ),
-                        child: Builder(
-                          builder: (context) {
-                            final List<String> watchList = [];
-                            final List<String> historyList = [];
-                            final currentList = selectedProfileTabIndex == 0
-                                ? watchList
-                                : historyList;
+                ),
 
-                            return GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.65,
-                                  ),
-                              itemCount: currentList.length,
-                              itemBuilder: (context, index) {
-                                return const SizedBox.shrink();
-                              },
+                SliverPadding(
+                  padding: const EdgeInsets.all(12),
+                  sliver: BlocBuilder<FavoritesCubit, FavoritesState>(
+                    builder: (_, fav) {
+                      return BlocBuilder<HistoryCubit, HistoryState>(
+                        builder: (_, hist) {
+                          final watch =
+                          fav is FavoritesLoaded ? fav.movies : <Movie>[];
+                          final history =
+                          hist is HistoryLoaded ? hist.movies : <Movie>[];
+
+                          final list = selectedIndex == 0 ? watch : history;
+
+                          if (list.isEmpty) {
+                            return const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: 350,
+                                child: Center(
+                                  child: Text("No items yet",
+                                      style: TextStyle(color: Colors.white70)),
+                                ),
+                              ),
                             );
-                          },
-                        ),
-                      ),
-                    ),
+                          }
+
+                          return SliverGrid(
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 14,
+                              crossAxisSpacing: 14,
+                              childAspectRatio: 0.62,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                final movie = list[index];
+
+                                return GestureDetector(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiBlocProvider(
+                                          providers: [
+                                            BlocProvider(
+                                              create: (_) =>
+                                              CubitMovieDetails(getIt())
+                                                ..loadMovie(movie.id.toString()),
+                                            ),
+                                            BlocProvider.value(
+                                                value: context.read<FavoritesCubit>()),
+                                            BlocProvider.value(
+                                                value: context.read<HistoryCubit>()),
+                                          ],
+                                          child: const MovieDetailsScreen(),
+                                        ),
+                                      ),
+                                    );
+
+                                    await context.read<FavoritesCubit>().loadFavorites();
+                                    await context.read<HistoryCubit>().loadHistory();
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Image.network(
+                                            movie.image ?? "",
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                Container(color: Colors.grey),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        movie.title ?? "",
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                      Text(
+                                        movie.rating.toString(),
+                                        style:
+                                        const TextStyle(color: Colors.white70),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              childCount: list.length,
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
+                )
+
+              ],
+            );
           },
         ),
       ),

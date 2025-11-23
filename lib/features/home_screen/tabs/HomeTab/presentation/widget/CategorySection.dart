@@ -61,8 +61,8 @@ class CategorySection extends StatelessWidget {
                         providers: [
                           BlocProvider(
                             create: (_) =>
-                                getIt<CubitMovieDetails>()
-                                  ..loadMovie(movies[index].id.toString()),
+                            getIt<CubitMovieDetails>()
+                              ..loadMovie(movies[index].id.toString()),
                           ),
                           BlocProvider(create: (_) => getIt<FavoriteCubit>()),
                         ],
