@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.movieDetailScreen: (context) => const MovieDetailsScreen(),
         AppRoutes.browseTab : (context) =>  BrowseTab(),
       },
-      initialRoute: AppRoutes.registerScreen,
+      initialRoute: AppRoutes.loginScreen,
     );
   }
 }
