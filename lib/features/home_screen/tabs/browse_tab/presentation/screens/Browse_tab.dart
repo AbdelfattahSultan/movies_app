@@ -6,11 +6,15 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_state.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 
 import '../widget/CategoryChipsBar.dart';
 
 class BrowseTab extends StatefulWidget {
-  const BrowseTab({Key? key}) : super(key: key);
+  const BrowseTab({super.key});
 
   @override
   State<BrowseTab> createState() => _BrowseTabState();
@@ -144,13 +148,73 @@ class _BrowseTabState extends State<BrowseTab> {
                               rating: movie.rating ?? 0.0,
 
                             );
-                          },
-                        );
-                      }
+                          }
 
-                      // initial fallback (قبل أي state)
-                      return const SizedBox.shrink();
-                    },
+                          if (state is MoviesSuccess) {
+                            final current = _categories[_selectedChipIndex];
+
+                            final List<Movie> movies =
+                                state.genreMoviesMap[_mapKey(current)] ?? [];
+
+                            if (movies.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'No movies found',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              );
+                            }
+
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: movies.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 11,
+                                    mainAxisSpacing: 11,
+                                    childAspectRatio: 1 / 1.3,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final Movie movie = movies[index];
+                                return MovesCard(
+                                  posterPath: movie.image ?? '',
+                                  rating: movie.rating ?? 0.0,
+                                  onTap: () {
+                                    context.read<HistoryCubit>().addMovie(
+                                      movie,
+                                    );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiBlocProvider(
+                                          providers: [
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<CubitMovieDetails>()
+                                                    ..loadMovie(
+                                                      movie.id.toString(),
+                                                    ),
+                                            ),
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<FavoriteCubit>(),
+                                            ),
+                                          ],
+                                          child: const MovieDetailsScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),

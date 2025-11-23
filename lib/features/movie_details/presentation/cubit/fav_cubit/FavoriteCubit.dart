@@ -11,7 +11,6 @@ class FavoriteCubit extends Cubit<FavoriteState> {
 
   FavoriteCubit(this.movieDetailsRepo) : super(FavoriteInitial());
 
-
   Future<void> checkIsFavorite(String movieId) async {
     try {
       final result = await movieDetailsRepo.isMovieFavorite(movieId);
@@ -22,7 +21,6 @@ class FavoriteCubit extends Cubit<FavoriteState> {
     }
   }
 
-
   Future<void> addMovieToFavorite({
     required String movieId,
     required String name,
@@ -32,14 +30,14 @@ class FavoriteCubit extends Cubit<FavoriteState> {
   }) async {
     emit(FavoriteLoading());
     try {
-      final FavoritesResponse response =
-          await movieDetailsRepo.addMovieToFavorite(
-        movieId: movieId,
-        name: name,
-        rating: rating,
-        imageURL: imageURL,
-        year: year,
-      );
+      final FavoritesResponse response = await movieDetailsRepo
+          .addMovieToFavorite(
+            movieId: movieId,
+            name: name,
+            rating: rating,
+            imageURL: imageURL,
+            year: year,
+          );
 
       final message =
           response.message ?? "Movie added to favorites successfully";
@@ -51,7 +49,6 @@ class FavoriteCubit extends Cubit<FavoriteState> {
       emit(FavoriteError(e.toString()));
     }
   }
-
 
   Future<void> removeMovieFromFavorite(String movieId) async {
     emit(FavoriteLoading());

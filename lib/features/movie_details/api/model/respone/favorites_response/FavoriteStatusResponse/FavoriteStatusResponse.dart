@@ -4,8 +4,6 @@ class FavoriteStatusResponse {
   FavoriteStatusResponse({required this.isFavorite});
 
   factory FavoriteStatusResponse.fromJson(Map<String, dynamic> json) {
-    return FavoriteStatusResponse(
-      isFavorite: json["data"] ?? false,
-    );
+    return FavoriteStatusResponse(isFavorite: json["data"] ?? false);
   }
 }

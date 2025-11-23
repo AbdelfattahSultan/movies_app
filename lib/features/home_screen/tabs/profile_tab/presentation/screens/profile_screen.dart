@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
+
+import 'package:movies_app/core/di/Di.dart';
 import 'package:movies_app/core/utils/token_helper.dart';
-import 'package:dio/dio.dart';
+
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/moves_card.dart';
+
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
-import '../../../../../../core/di/Di.dart';
-import '../../../../../movie_details/presentation/cubit/cubit_movie_details.dart';
-import '../../../../../movie_details/presentation/screen/movie_details_screen.dart';
-import '../../favourites/data/data_source/favorites_data_source_impl.dart';
-import '../../favourites/data/repositories/favorites_repository_impl.dart';
-import '../../favourites/presentation/cubit/favorites_cubit.dart';
-import '../../history/data/history_local_data_source.dart';
-import '../../history/presentation/cubit/history_cubit.dart';
-import '../../history/presentation/cubit/history_state.dart';
-import '../../favourites/presentation/cubit/favorites_state.dart';
-import 'update_profile_screen.dart';
+
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_state.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/update_profile_screen.dart';
+
+import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -45,9 +47,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     AppImages.avatar9,
   ];
 
-  String getAvatar(int id) {
-    if (id >= 1 && id <= avatars.length) return avatars[id - 1];
-    return avatars[0];
+  String getAvatarImage(int? avatarId) {
+    if (avatarId != null && avatarId >= 1 && avatarId <= avatars.length) {
+      return avatars[avatarId - 1];
+    } else {
+      return avatars[0];
+    }
   }
 
   @override
@@ -74,18 +79,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return Center(
                 child: Text("Error: ${state.message}", style: const TextStyle(color: Colors.red)),
               );
-            }
+            } else if (state is ProfileLoaded) {
+              UserModel user = state.user;
+              List<Movie> favorites = state.favorites;
 
-            if (state is! ProfileLoaded && state is! ProfileUpdated) {
-              return const SizedBox.shrink();
-            }
+              List<Movie> historyList = [];
+              final historyState = context.watch<HistoryCubit>().state;
+              if (historyState is HistoryLoaded) {
+                historyList = historyState.movies;
+              }
 
-            final user = state is ProfileLoaded ? state.user : (state as ProfileUpdated).user;
+              final int watchListCount = favorites.length;
+              final int historyCount = historyList.length;
 
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
+              return Column(
+                children: [
+                  Container(
                     color: AppColors.darkGray,
                     padding: const EdgeInsets.only(top: 52, left: 16, right: 16, bottom: 12),
                     child: Column(
@@ -94,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
+                            // Avatar + Name
                             Expanded(
                               child: Column(
                                 children: [
@@ -118,42 +128,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
-
+                            // Watch List count
                             Expanded(
-                              child: BlocBuilder<FavoritesCubit, FavoritesState>(
-                                builder: (context, fav) {
-                                  final count = fav is FavoritesLoaded ? fav.movies.length : 0;
-                                  return Column(
-                                    children: [
-                                      Text("$count",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold)),
-                                      const Text("Wish List",
-                                          style: TextStyle(color: Colors.white, fontSize: 16)),
-                                    ],
-                                  );
-                                },
+                              child: Column(
+                                children: [
+                                  Text(
+                                    watchListCount.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Watch List",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-
+                            // History count
                             Expanded(
-                              child: BlocBuilder<HistoryCubit, HistoryState>(
-                                builder: (context, hist) {
-                                  final count = hist is HistoryLoaded ? hist.movies.length : 0;
-                                  return Column(
-                                    children: [
-                                      Text("$count",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold)),
-                                      const Text("History",
-                                          style: TextStyle(color: Colors.white, fontSize: 16)),
-                                    ],
-                                  );
-                                },
+                              child: Column(
+                                children: [
+                                  Text(
+                                    historyCount.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "History",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -161,6 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 25),
 
+                        // Edit + Logout
                         Row(
                           children: [
                             Expanded(
@@ -199,10 +216,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               flex: 1,
                               child: InkWell(
-                                onTap: () async {
-                                  await TokenHelper.deleteToken();
-                                  Navigator.pushNamedAndRemoveUntil(
-                                      context, AppRoutes.loginScreen, (_) => false);
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      backgroundColor: AppColors.darkGray,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      title: Text(
+                                        "Log Out",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      content: const Text(
+                                        "Are you sure you want to log out?",
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text(
+                                            "Cancel",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            await TokenHelper.deleteToken();
+                                            Navigator.pushNamedAndRemoveUntil(
+                                              context,
+                                              AppRoutes.loginScreen,
+                                              (route) => false,
+                                            );
+                                          },
+                                          child: Text(
+                                            "Log Out",
+                                            style: TextStyle(
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   height: 50,
@@ -231,6 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 25),
 
+                        // Tabs: Watch List / History
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -250,11 +314,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onTap: () => setState(() => selectedIndex = 1),
                               child: Column(
                                 children: [
-                                  Icon(Icons.folder,
-                                      color: AppColors.primary, size: 40),
-                                  Text("History",
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.white, fontSize: 20)),
+                                  Icon(
+                                    Icons.history,
+                                    color: AppColors.primary,
+                                    size: 40,
+                                  ),
+                                  Text(
+                                    "History",
+                                    style: GoogleFonts.roboto(
+                                      color: AppColors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -277,98 +348,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                ),
 
-                SliverPadding(
-                  padding: const EdgeInsets.all(12),
-                  sliver: BlocBuilder<FavoritesCubit, FavoritesState>(
-                    builder: (_, fav) {
-                      return BlocBuilder<HistoryCubit, HistoryState>(
-                        builder: (_, hist) {
-                          final watch =
-                          fav is FavoritesLoaded ? fav.movies : <Movie>[];
-                          final history =
-                          hist is HistoryLoaded ? hist.movies : <Movie>[];
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Container(
+                        color: AppColors.eerieBlack,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 20,
+                        ),
+                        child: Builder(
+                          builder: (context) {
+                            final List<Movie> watchList = favorites;
+                            final List<Movie> historyMovies = historyList;
 
-                          final list = selectedIndex == 0 ? watch : history;
+                            final currentList = selectedProfileTabIndex == 0
+                                ? watchList
+                                : historyMovies;
 
-                          if (list.isEmpty) {
-                            return const SliverToBoxAdapter(
-                              child: SizedBox(
-                                height: 350,
-                                child: Center(
-                                  child: Text("No items yet",
-                                      style: TextStyle(color: Colors.white70)),
+                            if (currentList.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  selectedProfileTabIndex == 0
+                                      ? "No movies in Watch List yet."
+                                      : "No movies in History yet.",
+                                  style: const TextStyle(color: Colors.white70),
                                 ),
-                              ),
-                            );
-                          }
+                              );
+                            }
 
-                          return SliverGrid(
-                            gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 14,
-                              crossAxisSpacing: 14,
-                              childAspectRatio: 0.62,
-                            ),
-                            delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                final movie = list[index];
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: currentList.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 11,
+                                    mainAxisSpacing: 11,
+                                    childAspectRatio: 1 / 1.3,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final Movie movie = currentList[index];
 
-                                return GestureDetector(
-                                  onTap: () async {
-                                    await Navigator.push(
+                                return MovesCard(
+                                  posterPath: movie.image ?? '',
+                                  rating: movie.rating ?? 0.0,
+                                  onTap: () {
+                                
+                                    context.read<HistoryCubit>().addMovie(
+                                      movie,
+                                    );
+
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => MultiBlocProvider(
                                           providers: [
                                             BlocProvider(
                                               create: (_) =>
-                                              CubitMovieDetails(getIt())
-                                                ..loadMovie(movie.id.toString()),
+                                                  getIt<CubitMovieDetails>()
+                                                    ..loadMovie(
+                                                      movie.id.toString(),
+                                                    ),
                                             ),
-                                            BlocProvider.value(
-                                                value: context.read<FavoritesCubit>()),
-                                            BlocProvider.value(
-                                                value: context.read<HistoryCubit>()),
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<FavoriteCubit>(),
+                                            ),
                                           ],
                                           child: const MovieDetailsScreen(),
                                         ),
                                       ),
                                     );
-
-                                    await context.read<FavoritesCubit>().loadFavorites();
-                                    await context.read<HistoryCubit>().loadHistory();
                                   },
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.network(
-                                            movie.image ?? "",
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
-                                                Container(color: Colors.grey),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        movie.title ?? "",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(color: Colors.white),
-                                      ),
-                                      Text(
-                                        movie.rating.toString(),
-                                        style:
-                                        const TextStyle(color: Colors.white70),
-                                      ),
-                                    ],
-                                  ),
                                 );
                               },
                               childCount: list.length,
@@ -378,10 +432,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-                )
+                ],
+              );
+            }
 
-              ],
-            );
+            return const SizedBox.shrink();
           },
         ),
       ),

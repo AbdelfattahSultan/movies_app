@@ -9,6 +9,7 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/CategorySection.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/carousel_card.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
 import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
@@ -144,7 +145,8 @@ class _HomeTabState extends State<HomeTab> {
                                         return CarouselCard(
                                           image: movie.image ?? "",
                                           rating: movie.rating ?? 0.0,
-                                          onTap: () {
+                                          onTap: () {context.read<HistoryCubit>().addMovie(movie);
+
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(

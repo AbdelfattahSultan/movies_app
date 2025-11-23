@@ -12,7 +12,6 @@ class FavoritesResponse {
     List<favMovie>? parsedData;
 
     if (rawData is List) {
-
       parsedData = rawData
           .map((e) => favMovie.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -29,7 +28,7 @@ class FavoritesResponse {
   }
 
   Map<String, dynamic> toJson() => {
-        'message': message,
-        'data': data?.map((e) => e.toJson()).toList(),
-      };
+    'message': message,
+    'data': data?.map((e) => e.toJson()).toList(),
+  };
 }

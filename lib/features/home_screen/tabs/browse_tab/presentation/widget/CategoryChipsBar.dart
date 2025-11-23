@@ -46,12 +46,12 @@ class CategoryChipsBar extends StatelessWidget {
                   ),
                   boxShadow: isActive
                       ? [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.18),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    )
-                  ]
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.18),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
                       : null,
                 ),
                 alignment: Alignment.center,

@@ -36,12 +36,12 @@ class DetailsDataSourceImpl implements DetailsDataSource {
       year: year,
     );
   }
-  
+
   @override
-  Future<bool> isMovieFavorite(String movieId) async{
+  Future<bool> isMovieFavorite(String movieId) async {
     return await api.isMovieFavorite(movieId);
   }
-  
+
   @override
   Future<bool> deleteFromFavorite(String movieId) {
     return api.deleteFromFavorite(movieId);

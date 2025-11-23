@@ -6,7 +6,7 @@ class MovieInfo extends StatelessWidget {
   final String? poster;
   final String name;
   final String year;
-  final bool isFavorite; 
+  final bool isFavorite;
   final VoidCallback? onFavoriteTap;
 
   const MovieInfo({
@@ -14,7 +14,8 @@ class MovieInfo extends StatelessWidget {
     this.poster,
     required this.name,
     required this.year,
-    required this.onFavoriteTap,  this.isFavorite= false,
+    required this.onFavoriteTap,
+    this.isFavorite = false,
   });
 
   @override
@@ -82,9 +83,7 @@ class MovieInfo extends StatelessWidget {
               IconButton(
                 onPressed: onFavoriteTap,
                 icon: Icon(
-                  isFavorite
-                      ? Icons.bookmark      
-                      : Icons.bookmark_outline_outlined, 
+                  isFavorite ? Icons.bookmark : Icons.bookmark_outline_outlined,
                   size: 29,
                   color: AppColors.white,
                 ),
