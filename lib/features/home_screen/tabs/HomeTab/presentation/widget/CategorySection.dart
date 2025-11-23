@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/core/di/Di.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/moves_card.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
 import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
@@ -54,6 +55,7 @@ class CategorySection extends StatelessWidget {
                 posterPath: movie.image ?? "",
                 rating: movie.rating ?? 0.0,
                 onTap: () {
+                  context.read<HistoryCubit>().addMovie(movie);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -62,7 +64,7 @@ class CategorySection extends StatelessWidget {
                           BlocProvider(
                             create: (_) =>
                                 getIt<CubitMovieDetails>()
-                                  ..loadMovie(movies[index].id.toString()),
+                                  ..loadMovie(movie.id.toString()),
                           ),
                           BlocProvider(create: (_) => getIt<FavoriteCubit>()),
                         ],

@@ -11,7 +11,4 @@ abstract class AppRoutes {
   static const String forgetPassword = '/forgetPassword';
   static const String resetPasswordScreen = '/resetPasswordScreen';
   static const String browseTab = '/browseTab';
-
- 
-
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:movies_app/features/home_screen/tabs/search_tab/domain/repo/search_repo.dart';
 import 'package:movies_app/features/home_screen/tabs/search_tab/presentation/cubit/search_state.dart';
+
 @injectable
 class SearchCubit extends Cubit<SearchState> {
   SearchRepo searchRepo;

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:movies_app/core/config/constants.dart';
 import 'package:movies_app/core/utils/token_helper.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/fav_model/fav_respone/fav_respone.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 
 class ProfileRepository {
@@ -56,6 +58,23 @@ class ProfileRepository {
       );
     } catch (e) {
       throw Exception('Failed to delete profile: $e');
+    }
+  }
+
+  Future<List<Movie>> getFavMovie() async {
+    try {
+      final token = await TokenHelper.getToken();
+      final response = await _dio.get(
+        "https://route-movie-apis.vercel.app/favorites/all",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+
+      FavResponse favMovies = FavResponse.fromJson(response.data);
+      return favMovies.favMovies?.map((e) => e.toMovie()).toList() ?? [];
+    } on DioException catch (e) {
+      throw Exception("Network Error: ${e.message}");
+    } catch (e) {
+      throw Exception("Unexpected Error: $e");
     }
   }
 }

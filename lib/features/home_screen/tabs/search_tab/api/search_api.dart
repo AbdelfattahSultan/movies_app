@@ -5,7 +5,7 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.
 
 @LazySingleton()
 class SearchApi {
-  Dio _dio;
+  final Dio _dio;
 
   SearchApi(this._dio);
 

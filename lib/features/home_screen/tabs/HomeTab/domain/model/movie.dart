@@ -12,6 +12,6 @@ class Movie {
     required this.rating,
     required this.image,
     required this.year,
-    required this.genres,
+     this.genres,
   });
 }

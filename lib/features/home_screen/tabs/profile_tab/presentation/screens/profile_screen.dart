@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
 import 'package:movies_app/core/config/app_routes.dart';
+
+import 'package:movies_app/core/di/Di.dart';
+import 'package:movies_app/core/utils/token_helper.dart';
+
+import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/moves_card.dart';
+
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/models/user_model.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/data/repositories/profile_repo/profile_repository.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/profile_cubit/profile_state.dart';
-import 'update_profile_screen.dart';
+
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_state.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/screens/update_profile_screen.dart';
+
+import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
+import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
+import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,8 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     AppImages.avatar9,
   ];
 
-  String getAvatarImage(int avatarId) {
-    if (avatarId >= 1 && avatarId <= avatars.length) {
+  String getAvatarImage(int? avatarId) {
+    if (avatarId != null && avatarId >= 1 && avatarId <= avatars.length) {
       return avatars[avatarId - 1];
     } else {
       return avatars[0];
@@ -62,6 +77,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             } else if (state is ProfileLoaded) {
               UserModel user = state.user;
+              List<Movie> favorites = state.favorites;
+
+              List<Movie> historyList = [];
+              final historyState = context.watch<HistoryCubit>().state;
+              if (historyState is HistoryLoaded) {
+                historyList = historyState.movies;
+              }
+
+              final int watchListCount = favorites.length;
+              final int historyCount = historyList.length;
+
               return Column(
                 children: [
                   Container(
@@ -76,6 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
+                            // Avatar + Name
                             Expanded(
                               child: Column(
                                 children: [
@@ -100,19 +127,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+                            // Watch List count
                             Expanded(
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "12",
-                                    style: TextStyle(
+                                    watchListCount.toString(),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    "Wish List",
+                                  const Text(
+                                    "Watch List",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -121,18 +149,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+                            // History count
                             Expanded(
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "10",
-                                    style: TextStyle(
+                                    historyCount.toString(),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     "History",
                                     style: TextStyle(
                                       color: Colors.white,
@@ -145,6 +174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         const SizedBox(height: 25),
+
+                        // Edit + Logout
                         Row(
                           children: [
                             Expanded(
@@ -199,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      title: const Text(
+                                      title: Text(
                                         "Log Out",
                                         style: TextStyle(
                                           color: Colors.white,
@@ -222,8 +253,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
                                         TextButton(
-                                          onPressed: () {
+                                          onPressed: () async {
                                             Navigator.pop(context);
+                                            await TokenHelper.deleteToken();
                                             Navigator.pushNamedAndRemoveUntil(
                                               context,
                                               AppRoutes.loginScreen,
@@ -275,6 +307,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         const SizedBox(height: 25),
+
+                        // Tabs: Watch List / History
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -304,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Column(
                                 children: [
                                   Icon(
-                                    Icons.folder,
+                                    Icons.history,
                                     color: AppColors.primary,
                                     size: 40,
                                   ),
@@ -335,6 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
+
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -346,25 +381,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Builder(
                           builder: (context) {
-                            final List<String> watchList = [];
-                            final List<String> historyList = [];
+                            final List<Movie> watchList = favorites;
+                            final List<Movie> historyMovies = historyList;
+
                             final currentList = selectedProfileTabIndex == 0
                                 ? watchList
-                                : historyList;
+                                : historyMovies;
+
+                            if (currentList.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  selectedProfileTabIndex == 0
+                                      ? "No movies in Watch List yet."
+                                      : "No movies in History yet.",
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                              );
+                            }
 
                             return GridView.builder(
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: currentList.length,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.65,
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 11,
+                                    mainAxisSpacing: 11,
+                                    childAspectRatio: 1 / 1.3,
                                   ),
-                              itemCount: currentList.length,
                               itemBuilder: (context, index) {
-                                return const SizedBox.shrink();
+                                final Movie movie = currentList[index];
+
+                                return MovesCard(
+                                  posterPath: movie.image ?? '',
+                                  rating: movie.rating ?? 0.0,
+                                  onTap: () {
+                                
+                                    context.read<HistoryCubit>().addMovie(
+                                      movie,
+                                    );
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiBlocProvider(
+                                          providers: [
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<CubitMovieDetails>()
+                                                    ..loadMovie(
+                                                      movie.id.toString(),
+                                                    ),
+                                            ),
+                                            BlocProvider(
+                                              create: (_) =>
+                                                  getIt<FavoriteCubit>(),
+                                            ),
+                                          ],
+                                          child: const MovieDetailsScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                             );
                           },
@@ -375,6 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               );
             }
+
             return const SizedBox.shrink();
           },
         ),

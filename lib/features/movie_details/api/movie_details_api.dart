@@ -119,42 +119,35 @@ class MovieDetailsApi {
     return FavoriteStatusResponse.fromJson(response.data).isFavorite;
   }
 
-Future<bool> deleteFromFavorite(String movieId) async {
-  final token = await TokenHelper.getToken();
+  Future<bool> deleteFromFavorite(String movieId) async {
+    final token = await TokenHelper.getToken();
 
-  try {
-    final response = await _dio.delete(
-      "https://route-movie-apis.vercel.app/favorites/remove/$movieId",
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-        },
-      ),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return true;
-    }
-
-    final msg = response.data["message"]?.toString().toLowerCase() ?? "";
-    if (msg.contains("removed")) {
-      return true;
-    }
-
-    return false;
-  } on DioException catch (e) {
-    if (e.response != null) {
-      throw Exception(
-        "Server error: ${e.response?.data?['message'] ?? e.message}",
+    try {
+      final response = await _dio.delete(
+        "https://route-movie-apis.vercel.app/favorites/remove/$movieId",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
       );
-    } else {
-      throw Exception("Network error: ${e.message}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+
+      final msg = response.data["message"]?.toString().toLowerCase() ?? "";
+      if (msg.contains("removed")) {
+        return true;
+      }
+
+      return false;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+          "Server error: ${e.response?.data?['message'] ?? e.message}",
+        );
+      } else {
+        throw Exception("Network error: ${e.message}");
+      }
+    } catch (e) {
+      throw Exception("Unexpected error: $e");
     }
-  } catch (e) {
-    throw Exception("Unexpected error: $e");
   }
-}
-
-
-
 }

@@ -22,7 +22,7 @@ class MovieDetailsRepositoryImpl implements MovieDetailsRepo {
   }
 
   @override
-Future<FavoritesResponse> addMovieToFavorite({
+  Future<FavoritesResponse> addMovieToFavorite({
     required String movieId,
     required String name,
     required double rating,
@@ -37,15 +37,14 @@ Future<FavoritesResponse> addMovieToFavorite({
       year: year,
     );
   }
-  
+
   @override
-  Future<bool> isMovieFavorite(String movieId)async {
+  Future<bool> isMovieFavorite(String movieId) async {
     return await dataSource.isMovieFavorite(movieId);
   }
-  
+
   @override
-  Future<bool> deleteFromFavorite(String movieId) async{
-  return await dataSource.deleteFromFavorite(movieId);
+  Future<bool> deleteFromFavorite(String movieId) async {
+    return await dataSource.deleteFromFavorite(movieId);
   }
-  
 }

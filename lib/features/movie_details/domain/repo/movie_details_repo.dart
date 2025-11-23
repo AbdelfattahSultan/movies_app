@@ -5,7 +5,7 @@ import 'package:movies_app/features/movie_details/api/model/respone/favorites_re
 abstract class MovieDetailsRepo {
   Future<MovieDetails> getMovieDetails(String movieId);
   Future<List<Movie>> getMovieSuggestions(String? movieId);
-Future<FavoritesResponse> addMovieToFavorite({
+  Future<FavoritesResponse> addMovieToFavorite({
     required String movieId,
     required String name,
     required double rating,

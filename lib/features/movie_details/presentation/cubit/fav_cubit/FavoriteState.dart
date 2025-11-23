@@ -20,4 +20,3 @@ class FavoriteStatusLoaded extends FavoriteState {
   final bool isFavorite;
   FavoriteStatusLoaded(this.isFavorite);
 }
-

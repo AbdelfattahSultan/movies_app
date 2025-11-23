@@ -1,5 +1,3 @@
-// [File: movies_app/features/HomeTab/presentation/cubit/movies_cubit.dart]
-
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/repositories/movies_reposatry.dart';

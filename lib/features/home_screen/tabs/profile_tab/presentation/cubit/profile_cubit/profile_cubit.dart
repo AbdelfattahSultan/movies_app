@@ -12,7 +12,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(ProfileLoading());
     try {
       final user = await profileRepository.getProfile();
-      emit(ProfileLoaded(user));
+      final favMovies = await profileRepository.getFavMovie();
+      emit(ProfileLoaded(user, favMovies));
     } catch (e) {
       emit(ProfileError('Failed to load profile: $e'));
     }
@@ -22,7 +23,9 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(ProfileLoading());
     try {
       final newUser = await profileRepository.updateProfile(updatedUser);
+      final favMovies = await profileRepository.getFavMovie();
       emit(ProfileUpdated(newUser));
+      emit(ProfileLoaded(newUser, favMovies));
     } catch (e) {
       emit(ProfileError('Failed to update profile: $e'));
     }

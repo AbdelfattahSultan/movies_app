@@ -5,6 +5,7 @@ import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_state.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
+import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
 import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
@@ -12,7 +13,7 @@ import 'package:movies_app/features/movie_details/presentation/screen/movie_deta
 import '../widget/CategoryChipsBar.dart';
 
 class BrowseTab extends StatefulWidget {
-  const BrowseTab({Key? key}) : super(key: key);
+  const BrowseTab({super.key});
 
   @override
   State<BrowseTab> createState() => _BrowseTabState();
@@ -146,6 +147,9 @@ class _BrowseTabState extends State<BrowseTab> {
                                   posterPath: movie.image ?? '',
                                   rating: movie.rating ?? 0.0,
                                   onTap: () {
+                                    context.read<HistoryCubit>().addMovie(
+                                      movie,
+                                    );
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
