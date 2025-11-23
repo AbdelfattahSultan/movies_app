@@ -22,13 +22,13 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => LanCubit()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => LanCubit()),
+    ],
+    child: const MyApp(),
+  ),
+);
 }
 
 class MyApp extends StatelessWidget {
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.movieDetailScreen: (context) => const MovieDetailsScreen(),
         AppRoutes.browseTab : (context) =>  BrowseTab(),
       },
-      initialRoute: AppRoutes.homeScreen,
+      initialRoute: AppRoutes.registerScreen,
     );
   }
 }
