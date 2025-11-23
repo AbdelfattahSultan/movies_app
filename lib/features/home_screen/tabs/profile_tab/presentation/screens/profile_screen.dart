@@ -33,8 +33,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int selectedProfileTabIndex = 0;
-  int selectedBottomIndex = 3;
+  int selectedIndex = 0;
 
   final List<String> avatars = [
     AppImages.avatar1,
@@ -58,22 +57,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(ProfileRepository())..getProfile(),
+    final dio = Dio();
+    final favoritesRepo = FavoritesRepositoryImpl(FavoritesDataSourceImpl(dio));
+    final historyLocal = HistoryLocalDataSource();
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ProfileCubit(ProfileRepository())..getProfile()),
+        BlocProvider(create: (_) => FavoritesCubit(favoritesRepo)..loadFavorites()),
+        BlocProvider(create: (_) => HistoryCubit(historyLocal)..loadHistory()),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.eerieBlack,
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.yellow),
-              );
-            } else if (state is ProfileError) {
+              return const Center(child: CircularProgressIndicator(color: Colors.yellow));
+            }
+
+            if (state is ProfileError) {
               return Center(
-                child: Text(
-                  "Error: ${state.message}",
-                  style: const TextStyle(color: Colors.red),
-                ),
+                child: Text("Error: ${state.message}", style: const TextStyle(color: Colors.red)),
               );
             } else if (state is ProfileLoaded) {
               UserModel user = state.user;
@@ -92,13 +96,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Container(
                     color: AppColors.darkGray,
-                    padding: const EdgeInsets.only(
-                      top: 52,
-                      left: 16,
-                      right: 16,
-                    ),
+                    padding: const EdgeInsets.only(top: 52, left: 16, right: 16, bottom: 12),
                     child: Column(
                       children: [
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -109,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(60),
                                     child: Image.asset(
-                                      getAvatarImage(user.avaterId),
+                                      getAvatar(user.avaterId),
                                       width: 95,
                                       height: 95,
                                       fit: BoxFit.cover,
@@ -119,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     user.name,
                                     style: GoogleFonts.roboto(
-                                      color: AppColors.white,
+                                      color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -173,6 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
 
                         // Edit + Logout
@@ -182,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               flex: 2,
                               child: InkWell(
                                 onTap: () async {
-                                  final updatedUser = await Navigator.push(
+                                  final updated = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => BlocProvider.value(
@@ -193,10 +195,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   );
 
-                                  if (updatedUser is UserModel) {
-                                    setState(() {
-                                      user = updatedUser;
-                                    });
+                                  if (updated is UserModel) {
+                                    context.read<ProfileCubit>().updateProfile(updated);
                                   }
                                 },
                                 child: Container(
@@ -206,14 +206,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: const Center(
-                                    child: Text(
-                                      "Edit Profile",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                    child: Text("Edit Profile",
+                                        style: TextStyle(color: Colors.black, fontSize: 18)),
                                   ),
                                 ),
                               ),
@@ -281,23 +275,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: const Center(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          "Exit",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        Text("Exit",
+                                            style:
+                                            TextStyle(color: Colors.white, fontSize: 18)),
                                         SizedBox(width: 6),
-                                        Icon(
-                                          Icons.exit_to_app,
-                                          color: Colors.white,
-                                          size: 22,
-                                        ),
+                                        Icon(Icons.exit_to_app,
+                                            color: Colors.white, size: 22),
                                       ],
                                     ),
                                   ),
@@ -306,6 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 25),
 
                         // Tabs: Watch List / History
@@ -313,28 +299,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 0),
+                              onTap: () => setState(() => selectedIndex = 0),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.list,
-                                    color: AppColors.primary,
-                                    size: 40,
-                                  ),
-                                  Text(
-                                    "Watch List",
-                                    style: GoogleFonts.roboto(
-                                      color: AppColors.white,
-                                      fontSize: 20,
-                                    ),
-                                  ),
+                                  Icon(Icons.list,
+                                      color: AppColors.primary, size: 40),
+                                  Text("Watch List",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 20)),
                                 ],
                               ),
                             ),
                             InkWell(
-                              onTap: () =>
-                                  setState(() => selectedProfileTabIndex = 1),
+                              onTap: () => setState(() => selectedIndex = 1),
                               child: Column(
                                 children: [
                                   Icon(
@@ -354,18 +331,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+
+                        const SizedBox(height: 5),
+
                         AnimatedAlign(
                           duration: const Duration(milliseconds: 300),
-                          alignment: selectedProfileTabIndex == 0
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
+                          alignment:
+                          selectedIndex == 0 ? Alignment.centerLeft : Alignment.centerRight,
                           child: Container(
-                            height: 2,
+                            height: 1.5,
                             width: MediaQuery.of(context).size.width / 2,
                             color: AppColors.primary,
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -446,11 +425,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                 );
                               },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                              childCount: list.length,
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               );
