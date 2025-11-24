@@ -14,6 +14,7 @@ import 'package:movies_app/features/movie_details/widget/genres_card.dart';
 import 'package:movies_app/features/movie_details/widget/movie_badge.dart';
 import 'package:movies_app/features/movie_details/widget/movie_info.dart';
 import 'package:movies_app/features/movie_details/widget/screen_shoot_card.dart';
+import 'package:movies_app/features/movie_details/widget/youtube_webview.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
   const MovieDetailsScreen({super.key});
@@ -52,6 +53,7 @@ class MovieDetailsScreen extends StatelessWidget {
                 final movie = state.movieDetails;
                 final similarMovies = state.similarMovies;
                 final title = movie.title ?? '';
+                final thriller = movie.ytTrailerCode ?? '';
                 final poster = movie.largeCoverImage ?? '';
                 final year = movie.year?.toString() ?? '';
                 final likeCount = (movie.likeCount ?? 0).toString();
@@ -59,8 +61,8 @@ class MovieDetailsScreen extends StatelessWidget {
                 final rating = (movie.rating ?? 0).toStringAsFixed(1);
 
                 final summary =
-                (movie.descriptionIntro != null &&
-                    movie.descriptionIntro!.isNotEmpty)
+                    (movie.descriptionIntro != null &&
+                        movie.descriptionIntro!.isNotEmpty)
                     ? movie.descriptionIntro!
                     : (movie.descriptionFull ?? '');
 
@@ -86,6 +88,15 @@ class MovieDetailsScreen extends StatelessWidget {
                             year: year,
                             poster: poster,
                             isFavorite: isFav,
+                            onPlayTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      YoutubeWebView(trailerCode: thriller),
+                                ),
+                              );
+                            },
                             onFavoriteTap: () {
                               favCubit.toggleFavorite(
                                 movieId: movie.id.toString(),
@@ -160,12 +171,12 @@ class MovieDetailsScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: similarMovies.length,
                               gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                childAspectRatio: 1 / 1.3,
-                              ),
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 1 / 1.3,
+                                  ),
                               itemBuilder: (context, index) {
                                 return MovesCard(
                                   onTap: () {
@@ -176,11 +187,11 @@ class MovieDetailsScreen extends StatelessWidget {
                                           providers: [
                                             BlocProvider(
                                               create: (_) =>
-                                              getIt<CubitMovieDetails>()
-                                                ..loadMovie(
-                                                  similarMovies[index].id
-                                                      .toString(),
-                                                ),
+                                                  getIt<CubitMovieDetails>()
+                                                    ..loadMovie(
+                                                      similarMovies[index].id
+                                                          .toString(),
+                                                    ),
                                             ),
                                             BlocProvider(
                                               create: (_) =>
