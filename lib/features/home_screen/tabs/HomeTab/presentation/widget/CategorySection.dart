@@ -18,69 +18,72 @@ class CategorySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                "See More →",
-                style: const TextStyle(color: Colors.blue, fontSize: 16),
-              ),
-            ],
+                Text(
+                  "See More →",
+                  style: const TextStyle(color: Colors.blue, fontSize: 16),
+                ),
+              ],
+            ),
           ),
-        ),
-
-        const SizedBox(height: 10),
-
-        SizedBox(
-          height: size.height * 0.25,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: movies.length,
-            itemBuilder: (context, index) {
-              final movie = movies[index];
-
-              return MovesCard(
-                posterPath: movie.image ?? "",
-                rating: movie.rating ?? 0.0,
-                onTap: () {
-                  context.read<HistoryCubit>().addMovie(movie);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MultiBlocProvider(
-                        providers: [
-                          BlocProvider(
-                            create: (_) =>
-                                getIt<CubitMovieDetails>()
-                                  ..loadMovie(movie.id.toString()),
-                          ),
-                          BlocProvider(create: (_) => getIt<FavoriteCubit>()),
-                        ],
-                        child: const MovieDetailsScreen(),
+      
+          const SizedBox(height: 10),
+      
+          SizedBox(
+            height: size.height * 0.25,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                final movie = movies[index];
+      
+                return MovesCard(
+                  posterPath: movie.image ?? "",
+                  rating: movie.rating ?? 0.0,
+                  onTap: () {
+                    context.read<HistoryCubit>().addMovie(movie);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider(
+                              create: (_) =>
+                                  getIt<CubitMovieDetails>()
+                                    ..loadMovie(movie.id.toString()),
+                            ),
+                            BlocProvider(create: (_) => getIt<FavoriteCubit>()),
+                          ],
+                          child: const MovieDetailsScreen(),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(width: 10),
+                    );
+                  },
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+            ),
           ),
-        ),
-
-        const SizedBox(height: 20),
-      ],
+      
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
