@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movies_app/core/config/app_colors.dart';
+import 'package:movies_app/core/config/app_images.dart';
 
 class MovieInfo extends StatelessWidget {
   final String? poster;
@@ -8,6 +9,7 @@ class MovieInfo extends StatelessWidget {
   final String year;
   final bool isFavorite;
   final VoidCallback? onFavoriteTap;
+  final VoidCallback? onPlayTap;
 
   const MovieInfo({
     super.key,
@@ -16,6 +18,7 @@ class MovieInfo extends StatelessWidget {
     required this.year,
     required this.onFavoriteTap,
     this.isFavorite = false,
+    this.onPlayTap,
   });
 
   @override
@@ -55,12 +58,8 @@ class MovieInfo extends StatelessWidget {
         ),
 
         InkWell(
-          onTap: () {},
-          child: Image.asset(
-            "assets/images/play_icn.png",
-            width: 97,
-            height: 97,
-          ),
+          onTap: onPlayTap,
+          child: Image.asset(AppImages.play, width: 97, height: 97),
         ),
 
         Positioned(

@@ -54,6 +54,7 @@ dependencies:
   get_it:
   cached_network_image: ^3.4.1
   shared_preferences: ^2.5.3
+  webview_flutter: ^4.13.0
 
 dev_dependencies:
   injectable_generator:
