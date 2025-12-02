@@ -27,7 +27,9 @@ class AppRouter {
       AppRoutes.registerScreen: (context) => const Register(),
       AppRoutes.onBoarding: (context) => const Onboarding(),
       AppRoutes.introScreen: (context) => const IntroScreen(),
-      AppRoutes.homeTab: (context) => const HomeTab(),
+      AppRoutes.homeTab: (context) => HomeTab(
+        onSeeMoreTap: (_) {},
+      ),
       AppRoutes.forgetPassword: (context) => const ForgetPasswordScreen(),
       AppRoutes.homeScreen: (context) => const HomeScreen(),
       AppRoutes.profileScreen: (context) => const ProfileScreen(),
