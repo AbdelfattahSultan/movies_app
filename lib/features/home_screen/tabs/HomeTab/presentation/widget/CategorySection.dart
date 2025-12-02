@@ -11,8 +11,14 @@ import 'package:movies_app/features/movie_details/presentation/screen/movie_deta
 class CategorySection extends StatelessWidget {
   final String title;
   final List<Movie> movies;
+  final VoidCallback? onSeeMore;  // ⬅️ الإضافة الجديدة
 
-  const CategorySection({super.key, required this.title, required this.movies});
+  const CategorySection({
+    super.key,
+    required this.title,
+    required this.movies,
+    this.onSeeMore,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +39,14 @@ class CategorySection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                "See More →",
-                style: const TextStyle(color: Colors.blue, fontSize: 16),
+
+              /// زرار See More
+              GestureDetector(
+                onTap: onSeeMore,
+                child: const Text(
+                  "See More →",
+                  style: TextStyle(color: Colors.blue, fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -62,9 +73,8 @@ class CategorySection extends StatelessWidget {
                       builder: (_) => MultiBlocProvider(
                         providers: [
                           BlocProvider(
-                            create: (_) =>
-                                getIt<CubitMovieDetails>()
-                                  ..loadMovie(movie.id.toString()),
+                            create: (_) => getIt<CubitMovieDetails>()
+                              ..loadMovie(movie.id.toString()),
                           ),
                           BlocProvider(create: (_) => getIt<FavoriteCubit>()),
                         ],
