@@ -29,4 +29,5 @@ class AppImages {
   static const String forgetPassWord = "assets/images/forget_password.png";
 
   static const String empty = "assets/images/empty_movie.png";
+  static const String play = "assets/images/play_icn.png";
 }

@@ -11,86 +11,79 @@ import 'package:movies_app/features/movie_details/presentation/screen/movie_deta
 class CategorySection extends StatelessWidget {
   final String title;
   final List<Movie> movies;
-  final VoidCallback? onSeeMore;  // ⬅️ الإضافة الجديدة
 
-  const CategorySection({
-    super.key,
-    required this.title,
-    required this.movies,
-    this.onSeeMore,
-  });
+  const CategorySection({super.key, required this.title, required this.movies});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-
-              /// زرار See More
-              GestureDetector(
-                onTap: onSeeMore,
-                child: const Text(
+                Text(
                   "See More →",
-                  style: TextStyle(color: Colors.blue, fontSize: 16),
+                  style: const TextStyle(color: Colors.blue, fontSize: 16),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-
-        const SizedBox(height: 10),
-
-        SizedBox(
-          height: size.height * 0.25,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: movies.length,
-            itemBuilder: (context, index) {
-              final movie = movies[index];
-
-              return MovesCard(
-                posterPath: movie.image ?? "",
-                rating: movie.rating ?? 0.0,
-                onTap: () {
-                  context.read<HistoryCubit>().addMovie(movie);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MultiBlocProvider(
-                        providers: [
-                          BlocProvider(
-                            create: (_) => getIt<CubitMovieDetails>()
-                              ..loadMovie(movie.id.toString()),
-                          ),
-                          BlocProvider(create: (_) => getIt<FavoriteCubit>()),
-                        ],
-                        child: const MovieDetailsScreen(),
+      
+          const SizedBox(height: 10),
+      
+          SizedBox(
+            height: size.height * 0.25,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                final movie = movies[index];
+      
+                return MovesCard(
+                  posterPath: movie.image ?? "",
+                  rating: movie.rating ?? 0.0,
+                  onTap: () {
+                    context.read<HistoryCubit>().addMovie(movie);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider(
+                              create: (_) =>
+                                  getIt<CubitMovieDetails>()
+                                    ..loadMovie(movie.id.toString()),
+                            ),
+                            BlocProvider(create: (_) => getIt<FavoriteCubit>()),
+                          ],
+                          child: const MovieDetailsScreen(),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(width: 10),
+                    );
+                  },
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+            ),
           ),
-        ),
-
-        const SizedBox(height: 20),
-      ],
+      
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
