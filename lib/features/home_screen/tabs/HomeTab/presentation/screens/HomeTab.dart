@@ -3,214 +3,165 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/core/config/app_colors.dart';
 import 'package:movies_app/core/config/app_images.dart';
-import 'package:movies_app/core/di/Di.dart';
+import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_cubit.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/cubit/movies_state.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/CategorySection.dart';
-import 'package:movies_app/features/home_screen/tabs/HomeTab/domain/model/movie.dart';
 import 'package:movies_app/features/home_screen/tabs/HomeTab/presentation/widget/carousel_card.dart';
 import 'package:movies_app/features/home_screen/tabs/profile_tab/presentation/cubit/history/history_cubit.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/cubit_movie_details.dart';
 import 'package:movies_app/features/movie_details/presentation/cubit/fav_cubit/FavoriteCubit.dart';
 import 'package:movies_app/features/movie_details/presentation/screen/movie_details_screen.dart';
+import 'package:movies_app/core/di/Di.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+  final void Function(int index) onSeeMoreTap;
+
+  const HomeTab({super.key, required this.onSeeMoreTap});
 
   @override
   State<HomeTab> createState() => _HomeTabState();
 }
 
 class _HomeTabState extends State<HomeTab> {
-  String? _currentMovieImage;
-  final List<String> genresToDisplay = const [
-    "Action",
-    "animation",
-    "drama",
-    "Romance",
-  ];
+  String? currentImage;
 
-  Widget _buildGenreSection(BuildContext context, String genre) {
-    return BlocBuilder<MoviesCubit, MoviesState>(
-      buildWhen: (previous, current) => current is MoviesSuccess,
-      builder: (context, state) {
-        if (state is MoviesSuccess) {
-          final moviesList = state.genreMoviesMap[genre.toLowerCase()];
-          if (moviesList != null && moviesList.isNotEmpty) {
-            return CategorySection(title: "$genre ", movies: moviesList);
-          }
-        }
-        return const SizedBox();
-      },
-    );
-  }
+  final genres = ["Action", "Adventure", "Comedy", "Crime"];
 
-  void _updateBackgroundImage(List<Movie> movies, int index) {
-    if (movies.isNotEmpty && index >= 0 && index < movies.length) {
+  void updateBackground(List<Movie> movies, int index) {
+    if (index < movies.length) {
       setState(() {
-        _currentMovieImage = movies[index].image;
+        currentImage = movies[index].image;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final moviesCubit = getIt.get<MoviesCubit>();
+    final moviesCubit = context.read<MoviesCubit>();
     final size = MediaQuery.of(context).size;
 
-    return BlocProvider(
-      create: (context) {
-        moviesCubit.getTopMovies();
-        for (var genre in genresToDisplay) {
-          moviesCubit.grtMoviesByGenre(10, genre.toLowerCase());
-        }
-        return moviesCubit;
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              BlocBuilder<MoviesCubit, MoviesState>(
-                buildWhen: (previous, current) => current is MoviesSuccess,
-                builder: (context, state) {
-                  if (state is MoviesSuccess &&
-                      state.topMovies.isNotEmpty &&
-                      _currentMovieImage == null) {
-                    _currentMovieImage = state.topMovies.first.image;
-                  }
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            /// ------------------ TOP MOVIES ------------------
+            BlocBuilder<MoviesCubit, MoviesState>(
+              builder: (_, state) {
+                if (state is MoviesLoading) {
+                  return const SizedBox(
+                    height: 300,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
 
-                  final displayImage = _currentMovieImage;
+                if (state is MoviesSuccess) {
+                  final topMovies = state.topMovies;
+
+                  if (currentImage == null && topMovies.isNotEmpty) {
+                    currentImage = topMovies.first.image;
+                  }
 
                   return Stack(
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.75,
+                        height: size.height * 0.75,
                         decoration: BoxDecoration(
-                          image: displayImage != null && displayImage.isNotEmpty
+                          image: currentImage != null
                               ? DecorationImage(
-                                  image: NetworkImage(displayImage),
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.black.withOpacity(0.4),
-                                    BlendMode.darken,
-                                  ),
-                                )
+                            image: NetworkImage(currentImage!),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.4),
+                              BlendMode.darken,
+                            ),
+                          )
                               : null,
-                        
-                        ),
-                        foregroundDecoration: BoxDecoration(
-                            gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              AppColors.eerieBlack.withValues(alpha: 0.4),
-                              AppColors.eerieBlack,
-                            ],
-                          ),
                         ),
                       ),
+
                       Positioned.fill(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Image(
-                                image: AssetImage(AppImages.availableNow),
-                              ),
-                              BlocBuilder<MoviesCubit, MoviesState>(
-                                builder: (context, state) {
-                                  if (state is MoviesLoading) {
-                                    return const Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 30),
+                            const Image(image: AssetImage(AppImages.availableNow)),
 
-                                  if (state is MoviesSuccess) {
-                                    final topMovies = state.topMovies;
-                                    return CarouselSlider(
-                                      options: CarouselOptions(
-                                        height: size.height * 0.45,
-                                        enlargeCenterPage: true,
-                                        viewportFraction: 0.6,
-                                        aspectRatio: 16 / 9,
-                                        onPageChanged: (index, reason) {
-                                          _updateBackgroundImage(
-                                            topMovies,
-                                            index,
-                                          );
-                                        },
+                            CarouselSlider(
+                              options: CarouselOptions(
+                                height: size.height * 0.45,
+                                enlargeCenterPage: true,
+                                viewportFraction: 0.6,
+                                onPageChanged: (i, _) =>
+                                    updateBackground(topMovies, i),
+                              ),
+                              items: topMovies.map((movie) {
+                                return CarouselCard(
+                                  image: movie.image ?? "",
+                                  rating: movie.rating ?? 0.0,
+                                  onTap: () {
+                                    context.read<HistoryCubit>().addMovie(movie);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => MultiBlocProvider(
+                                          providers: [
+                                            BlocProvider(
+                                              create: (_) =>
+                                              getIt<CubitMovieDetails>()
+                                                ..loadMovie(movie.id.toString()),
+                                            ),
+                                            BlocProvider(
+                                              create: (_) => getIt<FavoriteCubit>(),
+                                            ),
+                                          ],
+                                          child: const MovieDetailsScreen(),
+                                        ),
                                       ),
-                                      items: topMovies.map((movie) {
-                                        return CarouselCard(
-                                          image: movie.image ?? "",
-                                          rating: movie.rating ?? 0.0,
-                                          onTap: () {
-                                            context
-                                                .read<HistoryCubit>()
-                                                .addMovie(movie);
-
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => MultiBlocProvider(
-                                                  providers: [
-                                                    BlocProvider(
-                                                      create: (_) =>
-                                                          getIt<
-                                                              CubitMovieDetails
-                                                            >()
-                                                            ..loadMovie(
-                                                              movie.id
-                                                                  .toString(),
-                                                            ),
-                                                    ),
-                                                    BlocProvider(
-                                                      create: (_) =>
-                                                          getIt<
-                                                            FavoriteCubit
-                                                          >(),
-                                                    ),
-                                                  ],
-                                                  child:
-                                                      const MovieDetailsScreen(),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      }).toList(),
                                     );
-                                  }
+                                  },
+                                );
+                              }).toList(),
+                            ),
 
-                                  if (state is MoviesError) {
-                                    return Text(
-                                      "Error: ${state.error}",
-                                      style: const TextStyle(color: Colors.red),
-                                    );
-                                  }
-                                  return const SizedBox();
-                                },
-                              ),
-                              const Image(
-                                image: AssetImage(AppImages.watchNow),
-                              ),
-                            ],
-                          ),
+                            const Image(image: AssetImage(AppImages.watchNow)),
+                          ],
                         ),
                       ),
                     ],
                   );
+                }
+
+                return const SizedBox();
+              },
+            ),
+
+            /// ------------------ GENRE LISTS ------------------
+            ...genres.map(
+                  (g) => BlocBuilder<MoviesCubit, MoviesState>(
+                builder: (_, state) {
+                  if (state is MoviesSuccess) {
+                    final movies =
+                        state.genreMoviesMap[g.toLowerCase()] ?? [];
+
+                    if (movies.isEmpty) return const SizedBox();
+
+                    return CategorySection(
+                      title: g,
+                      movies: movies,
+                      onSeeMore: () {
+                        final index = genres.indexOf(g);
+                        widget.onSeeMoreTap(index);
+                      },
+                    );
+                  }
+                  return const SizedBox();
                 },
               ),
-              ...genresToDisplay.map(
-                (genre) => _buildGenreSection(context, genre),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
