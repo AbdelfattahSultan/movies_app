@@ -17,6 +17,7 @@ class MoviesCubit extends Cubit<MoviesState> {
     try {
       _topMovies = await moviesReposatry.getTopMovies();
       emit(MoviesSuccess(_topMovies, _genreMoviesMap));
+      print("GENRE MAP KEYS = ${_genreMoviesMap.keys.toList()}");
     } catch (e) {
       emit(MoviesError(e.toString()));
     }
